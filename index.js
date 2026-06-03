@@ -27,7 +27,14 @@ const owner = process.env.GITHUB_OWNER || 'arulzzzxd'; // GitHub username
 const repo = process.env.GITHUB_REPO || 'uploadergh'; // Repository name
 const branch = process.env.GITHUB_BRANCH || 'main';
 
-app.use(fileUpload());
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 }, // Batas 50 MB (dalam hitungan bytes)
+    abortOnLimit: true,
+    responseOnLimit: JSON.stringify({ 
+        status: false, 
+        message: "File terlalu besar! Maksimal ukuran file yang diizinkan adalah 50 MB." 
+    })
+}));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
