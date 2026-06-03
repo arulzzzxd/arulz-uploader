@@ -140,7 +140,7 @@
                     rounded-xl shadow-xl p-8 card-glow">
             <h1 class="text-3xl font-extrabold text-center mb-6 text-gray-900 dark:text-white">Upload File</h1>     
             <p class="text-center mb-6 text-gray-600 dark:text-gray-300">
-                Ukuran file maksimal: 50 MB
+                Ukuran file maksimal: 20 MB
             </p>
             
             <form ref="uploadForm" id="uploadForm" action="/uploadfile" method="post" encType="multipart/form-data" class="space-y-6">
@@ -156,7 +156,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                         </svg>
                         <p class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Klik atau tarik file ke sini</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Supported files: All files (max. 50 MB</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Supported files: All files (max. 20 MB)</p>
                     </div>
                     <input type="file" name="file" id="fileInput" class="hidden" />
                 </div>
@@ -350,7 +350,7 @@
                 pdfIcon.innerHTML = `
                     <div class="text-5xl mb-2">📄</div>
                     <p class="text-lg font-medium text-gray-900 dark:text-white">PDF Document</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">${(file.size / (1024 * 1024)).toFixed(10)} MB</p>
                 `;
                 previewContent.appendChild(pdfIcon);
             } else {
@@ -360,7 +360,7 @@
                 fileIcon.innerHTML = `
                     <div class="text-5xl mb-2">📁</div>
                     <p class="text-lg font-medium text-gray-900 dark:text-white">${file.type || 'Unknown File'}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">${(file.size / (1024 * 1024)).toFixed(20)} MB</p>
                 `;
                 previewContent.appendChild(fileIcon);
             }
@@ -399,7 +399,7 @@
         const file = e.target.files[0];
         
         // PENTING: Validasi ukuran file maksimal 50 MB di sisi client
-        const maxSizeBytes = 50 * 1024 * 1024;
+        const maxSizeBytes = 10 * 1024 * 1024;
         if (file.size > maxSizeBytes) {
             alert('Ukuran file terlalu besar! Maksimal ukuran file adalah 50 MB.');
             fileInput.value = ''; // Reset input file
