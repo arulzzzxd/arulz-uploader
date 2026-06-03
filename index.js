@@ -172,7 +172,7 @@ app.post('/uploadfile', async (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unggahan Berhasil</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/upload-file-lab/fileupload7/main/uploads/1766330286639.jpeg?format=png&name=900x900">
+    <link rel="icon" type="image/x-icon" href="https://arulz-uploader.vercel.app/files/9t2ope.png">
     
     <!-- Konfigurasi Tailwind untuk dark mode -->
     <script>
