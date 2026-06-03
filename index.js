@@ -28,7 +28,7 @@ const repo = process.env.GITHUB_REPO || 'uploadergh'; // Repository name
 const branch = process.env.GITHUB_BRANCH || 'main';
 
 app.use(fileUpload({
-    limits: { fileSize: 50 * 1024 * 1024 }, // Batas 50 MB (dalam hitungan bytes)
+    limits: { fileSize: 20 * 1024 * 1024 }, // Batas 50 MB (dalam hitungan bytes)
     abortOnLimit: true,
     responseOnLimit: JSON.stringify({ 
         status: false, 
