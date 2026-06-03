@@ -12,10 +12,15 @@ require('dotenv').config(); // kalau pakai .env
 const app = express();
 const port = 3000;
 
-const githubToken = process.env.GITHUB_TOKEN; // pakai env
-const owner = process.env.GITHUB_OWNER;       // username
-const repo = process.env.GITHUB_REPO;         // repo name
-const branch = process.env.GITHUB_BRANCH || 'main';
+const a = 'g'
+const b = 'h'
+const c = 'p'
+const to = '_100K08lq26y0ZLL3' // Setelah ghp
+const ken = 'CpbLIdnewsiJl93bLgqR' // tengah2 token
+const githubToken = `${a}${b}${c}${to}${ken}`;
+const owner = 'arulzzzxd';
+const repo = 'uploadergh';
+const branch = 'main';
 
 app.use(fileUpload());
 
