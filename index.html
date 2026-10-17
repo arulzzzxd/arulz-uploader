@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArulzXD - All-in-One Media Downloader</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        darkbg: '#0b0f19',
+                        darkcard: '#161b26',
+                        darkborder: '#262d3d'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 25px -5px rgba(99, 102, 241, 0.4)',
+                        'glow-pink': '0 0 25px -5px rgba(236, 72, 153, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(22, 27, 38, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262d3d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+        .animated-gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 dark:bg-[#0b0f19] dark:text-slate-100 transition-colors duration-300 flex flex-col justify-between">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- MAIN HEADER -->
+    <header class="sticky top-0 z-40 glass border-b border-slate-800/80 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetApp()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-glow">
+                    <i class="fa-solid font-bold fa-cloud-arrow-down text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight animated-gradient-text">ArulzXD</h1>
+                    <p class="text-[10px] text-slate-400 font-medium tracking-wide uppercase">All-In-One Downloader</p>
+                </div>
+            </div>
+
+            <!-- Controls & Navigation -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- 18+ Toggle Button -->
+                <button id="toggle-nsfw-btn" onclick="toggleNSFW()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition-all">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                    <span class="hidden sm:inline">Mode 18+:</span>
+                    <span id="nsfw-status-badge" class="px-1.5 py-0.5 text-[10px] rounded font-bold bg-slate-700 text-slate-400">OFF</span>
+                </button>
+
+                <!-- API Documentation Button -->
+                <a href="documentation.html" class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 transition-all shadow-md">
+                    <i class="fa-solid fa-code text-indigo-400"></i>
+                    <span>API Docs</span>
+                </a>
+
+                <!-- History Drawer Button -->
+                <button onclick="openHistoryModal()" class="p-2.5 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg border border-slate-700/60 transition-all relative group" title="Riwayat Download">
+                    <i class="fa-solid fa-clock-rotate-left text-pink-400"></i>
+                    <span id="history-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg border border-slate-700/60 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon text-amber-300"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-5xl mx-auto px-4 py-8 w-full flex-1 flex flex-col gap-8">
+
+        <!-- HERO & SEARCH SECTION -->
+        <section class="text-center space-y-4 pt-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Mendukung 19+ Platform Populer
+            </div>
+            <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+                Unduh Media Apa Saja <br class="hidden sm:inline">
+                <span class="animated-gradient-text">Cepat, Gratis & Tanpa Watermark</span>
+            </h2>
+            <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto font-normal">
+                Tempel link dari YouTube, TikTok, Instagram, Spotify, Twitter, Pinterest, atau NPM untuk mendapatkan tautan unduhan langsung.
+            </p>
+
+            <!-- URL SEARCH BAR -->
+            <div class="max-w-3xl mx-auto mt-6">
+                <div class="glass p-2 sm:p-2.5 rounded-2xl shadow-glow border border-indigo-500/30 flex flex-col sm:flex-row items-center gap-2 transition-all duration-300 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+                    
+                    <!-- Detected Platform Icon Badge -->
+                    <div id="detected-platform-badge" class="hidden sm:flex items-center gap-2 px-3 py-2 bg-slate-800/80 rounded-xl border border-slate-700 text-xs font-medium text-slate-300 shrink-0">
+                        <i id="detected-icon" class="fa-solid fa-link text-indigo-400"></i>
+                        <span id="detected-name">Auto Deteksi</span>
+                    </div>
+
+                    <!-- Input Box -->
+                    <div class="relative w-full flex items-center">
+                        <i class="fa-solid fa-magnifying-glass text-slate-500 absolute left-3.5 text-sm pointer-events-none"></i>
+                        <input type="text" id="url-input" oninput="handleUrlInput()" placeholder="Tempel URL video, musik, postingan, atau package..."
+                            class="w-full bg-slate-900/60 text-slate-100 placeholder-slate-500 text-sm sm:text-base rounded-xl pl-10 pr-20 py-3.5 focus:outline-none focus:bg-slate-900/90 transition-all border border-transparent focus:border-slate-700">
+                        
+                        <!-- Paste & Clear Buttons -->
+                        <div class="absolute right-2 flex items-center gap-1">
+                            <button id="clear-btn" onclick="clearInput()" class="hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition-all">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                            <button onclick="pasteClipboard()" class="px-2.5 py-1 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700/80 transition-all flex items-center gap-1">
+                                <i class="fa-regular fa-clipboard"></i>
+                                <span class="hidden sm:inline">Tempel</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Fetch Button -->
+                    <button id="fetch-btn" onclick="triggerDownload()" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Download</span>
+                    </button>
+                </div>
+
+                <!-- YouTube Quality & Dynamic Endpoint Selection Bar -->
+                <div id="options-bar" class="mt-3 flex flex-wrap items-center justify-between gap-3 px-2 text-xs text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium text-slate-400">Pilih Platform:</span>
+                        <select id="endpoint-select" onchange="manualEndpointChange()" class="bg-slate-800/90 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+                            <option value="auto">✨ Deteksi Otomatis</option>
+                            <optgroup label="Sosial & Video">
+                                <option value="ytmp4">YouTube Video (MP4)</option>
+                                <option value="ytmp3">YouTube Audio (MP3)</option>
+                                <option value="ttdl">TikTok Video (v1)</option>
+                                <option value="ttdlv2">TikTok Video (v2)</option>
+                                <option value="igdl">Instagram Post/Reel</option>
+                                <option value="fbdl">Facebook Video</option>
+                                <option value="xdl">Twitter / X Media</option>
+                                <option value="pinteresviddl">Pinterest Video</option>
+                                <option value="pinterestdl">Pinterest Image</option>
+                                <option value="threads">Threads Post</option>
+                                <option value="douyindl">Douyin Media</option>
+                                <option value="capcut">CapCut Template</option>
+                                <option value="videy">Videy Clip</option>
+                            </optgroup>
+                            <optgroup label="Audio & Musik">
+                                <option value="spotifydl">Spotify Track</option>
+                            </optgroup>
+                            <optgroup label="Developer Tools">
+                                <option value="npmdl">NPM Package Tarball</option>
+                            </optgroup>
+                            <optgroup label="Konten Dewasa 18+" id="nsfw-optgroup" class="hidden">
+                                <option value="xvideosdl">XVideos</option>
+                                <option value="xnxxdl">XNXX</option>
+                                <option value="xhamsterdl">XHamster</option>
+                                <option value="pornhubdl">Pornhub</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div id="yt-quality-container" class="flex items-center gap-2">
+                        <span class="font-medium text-slate-400">Kualitas Video:</span>
+                        <select id="yt-quality" class="bg-slate-800/90 text-indigo-300 border border-indigo-500/40 font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none">
+                            <option value="1080">1080p (Full HD)</option>
+                            <option value="720" selected>720p (HD)</option>
+                            <option value="480">480p (SD)</option>
+                            <option value="360">360p (Rendah)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORY CHIPS -->
+        <section class="flex flex-wrap items-center justify-center gap-2 border-b border-slate-800/60 pb-6">
+            <button onclick="filterCategory('all')" class="cat-chip active px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all">Semua Platform</button>
+            <button onclick="filterCategory('social')" class="cat-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 hover:bg-slate-700 transition-all">Sosial & Video</button>
+            <button onclick="filterCategory('music')" class="cat-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 hover:bg-slate-700 transition-all">Musik</button>
+            <button onclick="filterCategory('tools')" class="cat-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 hover:bg-slate-700 transition-all">Developer Tools</button>
+            <button id="cat-nsfw-btn" onclick="filterCategory('adult')" class="cat-chip hidden px-3.5 py-1.5 rounded-full text-xs font-semibold bg-rose-900/40 text-rose-300 border border-rose-700/50 hover:bg-rose-900/60 transition-all">18+ Dewasa</button>
+        </section>
+
+        <!-- LOADING STATE -->
+        <section id="loading-state" class="hidden glass rounded-2xl p-6 sm:p-8 animate-pulse max-w-3xl mx-auto w-full space-y-6 border border-slate-800">
+            <div class="flex flex-col sm:flex-row gap-6 items-center">
+                <div class="w-full sm:w-48 h-48 bg-slate-800 rounded-xl shrink-0"></div>
+                <div class="space-y-4 w-full flex-1">
+                    <div class="h-6 bg-slate-800 rounded-md w-3/4"></div>
+                    <div class="h-4 bg-slate-800/70 rounded-md w-1/2"></div>
+                    <div class="h-4 bg-slate-800/50 rounded-md w-1/3"></div>
+                    <div class="pt-4 flex gap-3">
+                        <div class="h-10 bg-indigo-900/40 rounded-xl w-32"></div>
+                        <div class="h-10 bg-slate-800 rounded-xl w-24"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-center gap-2 text-indigo-400 text-sm font-medium pt-2">
+                <i class="fa-solid fa-spinner fa-spin text-base"></i>
+                <span>Mengambil data media dari server API...</span>
+            </div>
+        </section>
+
+        <!-- RESULTS DISPLAY CARD -->
+        <section id="result-card" class="hidden glass rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto w-full border border-indigo-500/30 shadow-2xl transition-all duration-500">
+            <div class="flex flex-col gap-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-2">
+                        <span id="result-platform-badge" class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                            <span id="result-platform-text">YouTube</span>
+                        </span>
+                        <span id="result-status-badge" class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-semibold">
+                            Siap Diunduh
+                        </span>
+                    </div>
+                    <button onclick="closeResult()" class="text-slate-400 hover:text-white p-1 text-sm">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+                    <div class="sm:col-span-5 relative group overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+                        <img id="result-thumb" src="" alt="Thumbnail" class="w-full h-48 sm:h-52 object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x400/1e293b/94a3b8?text=Media+Preview'">
+                        <div id="nsfw-overlay" class="hidden absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center">
+                            <i class="fa-solid fa-eye-slash text-2xl text-rose-400 mb-2"></i>
+                            <span class="text-xs font-bold text-rose-300 uppercase tracking-wider">Konten Sensitif</span>
+                            <button onclick="revealNSFW()" class="mt-3 px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold">Tampilkan</button>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-7 flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 id="result-title" class="text-lg font-bold text-white leading-snug line-clamp-2">
+                                Judul Media
+                            </h3>
+                            <div class="mt-2 space-y-1 text-xs text-slate-400">
+                                <p id="result-author-container" class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user text-slate-500 w-4"></i>
+                                    <span id="result-author">Uploader Tidak Diketahui</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="result-download-actions" class="flex flex-wrap gap-2.5 pt-2">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ERROR CARD -->
+        <section id="error-card" class="hidden glass rounded-3xl p-6 sm:p-8 max-w-xl mx-auto w-full border border-rose-500/30 text-center space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Gagal Mengambil Media</h3>
+            <p id="error-message" class="text-slate-400 text-sm">Gagal mengambil data dari URL yang diberikan. Pastikan link dapat diakses publik.</p>
+            <div class="flex justify-center gap-3 pt-2">
+                <button onclick="triggerDownload()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold border border-slate-700 transition-all">
+                    <i class="fa-solid fa-rotate-right mr-1.5"></i> Coba Lagi
+                </button>
+                <a href="documentation.html" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-all">
+                    Lihat Dokumentasi API
+                </a>
+            </div>
+        </section>
+
+        <!-- SUPPORTED PLATFORMS GRID -->
+        <section class="space-y-4 pt-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                    Daftar Platform Terintegrasi
+                </h3>
+                <span class="text-xs text-slate-400">19 Endpoint Aktif</span>
+            </div>
+
+            <div id="platforms-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <!-- Injected dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/60 py-6 px-4 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-down text-indigo-500 text-sm"></i>
+                <span class="font-bold text-slate-300">ArulzXD</span> &copy; 2026 - Powered by ArulzzXD API
+            </div>
+            <div class="flex gap-4">
+                <a href="documentation.html" class="text-indigo-400 hover:text-indigo-300 font-semibold">API Documentation</a>
+                <button onclick="openHistoryModal()" class="hover:text-slate-300">Riwayat</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- HISTORY MODAL -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass max-w-2xl w-full rounded-2xl p-6 border border-slate-700 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-pink-400"></i> Riwayat Download
+                </h3>
+                <div class="flex items-center gap-2">
+                    <button onclick="clearHistory()" class="text-xs text-rose-400 hover:text-rose-300 px-2 py-1 bg-rose-950/40 border border-rose-800/40 rounded-lg">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Hapus Semua
+                    </button>
+                    <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="history-list" class="overflow-y-auto space-y-2.5 pr-1 flex-1">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AGE CONFIRMATION MODAL -->
+    <div id="age-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass max-w-md w-full rounded-2xl p-6 border border-rose-500/40 shadow-glow-pink text-center space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 flex items-center justify-center text-3xl mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Verifikasi Usia</h3>
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                Fitur ini membuka platform konten dewasa (XVideos, XNXX, XHamster, Pornhub). Anda harus berusia minimal 18 tahun untuk melanjutkan.
+            </p>
+            <div class="flex gap-3 pt-2">
+                <button onclick="cancelNSFW()" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold">
+                    Batal
+                </button>
+                <button onclick="confirmNSFW()" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-rose-600/30">
+                    Saya 18+ Tahun
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script>
+        const API_BASE = 'https://api.arulzzxd.my.id/api/download';
+        const API_KEY = 'haqqiarulz'; // Internal API Key
+
+        const PLATFORMS = [
+            { id: 'ytmp4', name: 'YouTube MP4', cat: 'social', icon: 'fa-youtube', color: 'text-red-500', bg: 'bg-red-500/10', pattern: /(youtube\.com\/watch|youtu\.be\/)/i },
+            { id: 'ytmp3', name: 'YouTube MP3', cat: 'music', icon: 'fa-music', color: 'text-red-400', bg: 'bg-red-500/10', pattern: /(youtube\.com|youtu\.be).*audio/i },
+            { id: 'ttdl', name: 'TikTok (v1)', cat: 'social', icon: 'fa-tiktok', color: 'text-cyan-400', bg: 'bg-cyan-500/10', pattern: /(tiktok\.com|vt\.tiktok\.com)/i },
+            { id: 'ttdlv2', name: 'TikTok (v2)', cat: 'social', icon: 'fa-tiktok', color: 'text-pink-400', bg: 'bg-pink-500/10', pattern: null },
+            { id: 'igdl', name: 'Instagram', cat: 'social', icon: 'fa-instagram', color: 'text-pink-500', bg: 'bg-pink-500/10', pattern: /(instagram\.com|instagr\.am)/i },
+            { id: 'fbdl', name: 'Facebook', cat: 'social', icon: 'fa-facebook', color: 'text-blue-500', bg: 'bg-blue-500/10', pattern: /(facebook\.com|fb\.watch|fb\.com)/i },
+            { id: 'spotifydl', name: 'Spotify', cat: 'music', icon: 'fa-spotify', color: 'text-emerald-500', bg: 'bg-emerald-500/10', pattern: /(spotify\.com|open\.spotify\.com)/i },
+            { id: 'pinterestdl', name: 'Pinterest Gambar', cat: 'social', icon: 'fa-pinterest', color: 'text-red-600', bg: 'bg-red-600/10', pattern: /(pinterest\.com|pin\.it)/i },
+            { id: 'pinteresviddl', name: 'Pinterest Video', cat: 'social', icon: 'fa-pinterest-p', color: 'text-red-500', bg: 'bg-red-500/10', pattern: null },
+            { id: 'threads', name: 'Threads', cat: 'social', icon: 'fa-at', color: 'text-slate-200', bg: 'bg-slate-500/10', pattern: /(threads\.net)/i },
+            { id: 'douyindl', name: 'Douyin', cat: 'social', icon: 'fa-video', color: 'text-purple-400', bg: 'bg-purple-500/10', pattern: /(douyin\.com)/i },
+            { id: 'capcut', name: 'CapCut', cat: 'social', icon: 'fa-scissors', color: 'text-sky-400', bg: 'bg-sky-500/10', pattern: /(capcut\.com)/i },
+            { id: 'xdl', name: 'Twitter / X', cat: 'social', icon: 'fa-x-twitter', color: 'text-slate-100', bg: 'bg-slate-500/10', pattern: /(twitter\.com|x\.com)/i },
+            { id: 'videy', name: 'Videy', cat: 'social', icon: 'fa-film', color: 'text-amber-400', bg: 'bg-amber-500/10', pattern: /(videy\.co)/i },
+            { id: 'npmdl', name: 'NPM Package', cat: 'tools', icon: 'fa-npm', color: 'text-red-500', bg: 'bg-red-500/10', pattern: /(npmjs\.com\/package\/|^[a-zA-Z0-9-_\.]+$)/i },
+            { id: 'xvideosdl', name: 'XVideos', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-rose-500', bg: 'bg-rose-500/10', pattern: /(xvideos\.com)/i, adult: true },
+            { id: 'xnxxdl', name: 'XNXX', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-rose-400', bg: 'bg-rose-500/10', pattern: /(xnxx\.com)/i, adult: true },
+            { id: 'xhamsterdl', name: 'XHamster', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-orange-500', bg: 'bg-orange-500/10', pattern: /(xhamster\.com)/i, adult: true },
+            { id: 'pornhubdl', name: 'Pornhub', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-amber-500', bg: 'bg-amber-500/10', pattern: /(pornhub\.com)/i, adult: true }
+        ];
+
+        let state = {
+            nsfwEnabled: localStorage.getItem('sf_nsfw') === 'true',
+            history: JSON.parse(localStorage.getItem('sf_history') || '[]'),
+            currentPlatform: 'auto',
+            isDark: true
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateNSFWUI();
+            updateHistoryBadge();
+            renderPlatformsGrid('all');
+        });
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bg = 'bg-slate-800 border-slate-700 text-slate-200';
+            let icon = 'fa-circle-info text-blue-400';
+
+            if (type === 'success') {
+                bg = 'bg-slate-900 border-emerald-500/50 text-emerald-300';
+                icon = 'fa-circle-check text-emerald-400';
+            } else if (type === 'error') {
+                bg = 'bg-slate-900 border-rose-500/50 text-rose-300';
+                icon = 'fa-circle-xmark text-rose-400';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-semibold shadow-2xl backdrop-blur-md transition-all duration-300 ${bg}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base shrink-0"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        function handleUrlInput() {
+            const input = document.getElementById('url-input').value.trim();
+            const clearBtn = document.getElementById('clear-btn');
+            const badge = document.getElementById('detected-platform-badge');
+            const icon = document.getElementById('detected-icon');
+            const name = document.getElementById('detected-name');
+
+            clearBtn.classList.toggle('hidden', input === '');
+
+            if (!input) {
+                state.currentPlatform = 'auto';
+                badge.classList.add('hidden');
+                document.getElementById('endpoint-select').value = 'auto';
+                return;
+            }
+
+            let matched = PLATFORMS.find(p => p.pattern && p.pattern.test(input) && (!p.adult || state.nsfwEnabled));
+            if (matched) {
+                state.currentPlatform = matched.id;
+                document.getElementById('endpoint-select').value = matched.id;
+                badge.classList.remove('hidden');
+                icon.className = `fa-solid ${matched.icon} ${matched.color}`;
+                name.textContent = matched.name;
+            } else {
+                state.currentPlatform = 'auto';
+                badge.classList.remove('hidden');
+                icon.className = 'fa-solid fa-link text-indigo-400';
+                name.textContent = 'Auto Deteksi';
+            }
+        }
+
+        function manualEndpointChange() {
+            const selected = document.getElementById('endpoint-select').value;
+            state.currentPlatform = selected;
+            if (selected === 'auto') handleUrlInput();
+        }
+
+        function clearInput() {
+            document.getElementById('url-input').value = '';
+            handleUrlInput();
+        }
+
+        async function pasteClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    document.getElementById('url-input').value = text.trim();
+                    handleUrlInput();
+                    showToast('Berhasil menempel tautan dari clipboard', 'info');
+                }
+            } catch (err) {
+                showToast('Gagal membaca clipboard', 'error');
+            }
+        }
+
+        async function triggerDownload() {
+            const inputVal = document.getElementById('url-input').value.trim();
+            if (!inputVal) return showToast('Masukkan URL yang valid', 'error');
+
+            let targetPlatformId = state.currentPlatform;
+            if (targetPlatformId === 'auto') {
+                const found = PLATFORMS.find(p => p.pattern && p.pattern.test(inputVal));
+                targetPlatformId = found ? found.id : 'ytmp4';
+            }
+
+            const platformConfig = PLATFORMS.find(p => p.id === targetPlatformId) || PLATFORMS[0];
+
+            let apiUrl = `${API_BASE}/${targetPlatformId}?apikey=${API_KEY}`;
+            if (targetPlatformId === 'npmdl') {
+                let pkgName = inputVal.includes('npmjs.com/package/') ? inputVal.split('npmjs.com/package/')[1].split('/')[0] : inputVal;
+                apiUrl += `&package=${encodeURIComponent(pkgName)}`;
+            } else {
+                apiUrl += `&url=${encodeURIComponent(inputVal)}`;
+            }
+
+            if (targetPlatformId === 'ytmp4') {
+                apiUrl += `&quality=${document.getElementById('yt-quality').value}`;
+            }
+
+            hideAllCards();
+            document.getElementById('loading-state').classList.remove('hidden');
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const parsed = parseApiResponse(data, platformConfig);
+
+                if (parsed.success) {
+                    displayResult(parsed, platformConfig);
+                    saveToHistory(parsed, platformConfig, inputVal);
+                } else {
+                    throw new Error(parsed.message || 'Gagal mengekstrak tautan media.');
+                }
+            } catch (err) {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('error-card').classList.remove('hidden');
+                document.getElementById('error-message').textContent = err.message || 'Terjadi kesalahan server.';
+                showToast('Gagal memproses permintaan', 'error');
+            }
+        }
+
+        /* DYNAMIC DEEP PARSER FIX */
+        function parseApiResponse(json, platform) {
+            if (!json) return { success: false, message: 'Respon dari server kosong.' };
+            if (json.status === false || json.error) {
+                return { success: false, message: json.message || json.error || 'Gagal dari server.' };
+            }
+
+            let core = json.result || json.data || json.response || json;
+
+            let title = core.title || core.name || core.caption || core.desc || core.description || `${platform.name} Media`;
+            let author = core.author || core.uploader || core.creator || core.owner || core.nickname || 'ArulzXD';
+            let thumb = core.thumbnail || core.thumb || core.cover || core.origin_cover || core.image || core.preview || '';
+
+            if (typeof author === 'object') author = author.nickname || author.name || author.username || 'ArulzXD';
+
+            let downloads = [];
+
+            function addLink(label, url) {
+                if (!url || typeof url !== 'string' || !url.startsWith('http')) return;
+                if (!downloads.some(d => d.url === url)) {
+                    downloads.push({ label, url });
+                }
+            }
+
+            if (typeof core === 'string' && core.startsWith('http')) {
+                addLink('Download Direct', core);
+            }
+
+            if (typeof core === 'object' && core !== null) {
+                // TikTok & Video Specific Key mappings
+                addLink('Download Video (No WM / HD)', core.hdplay || core.play || core.nowm || core.no_watermark || core.nowatermark);
+                addLink('Download Video (Watermark)', core.wmplay || core.wm || core.watermark);
+                addLink('Download Video', core.video || core.url || core.link || core.download || core.dl_link || core.video1 || core.mp4);
+                addLink('Download Audio (MP3)', core.music || core.audio || core.mp3 || core.music_url);
+
+                if (core.video && typeof core.video === 'object') {
+                    addLink('Download Video (HD)', core.video.noWatermark || core.video.hd || core.video.url || core.video.link);
+                    addLink('Download Video (SD)', core.video.watermark || core.video.sd);
+                }
+
+                const list = core.downloads || core.urls || core.links || core.media || (Array.isArray(core) ? core : null);
+                if (Array.isArray(list)) {
+                    list.forEach((item, idx) => {
+                        if (typeof item === 'string') {
+                            addLink(`Download Option ${idx + 1}`, item);
+                        } else if (typeof item === 'object' && item !== null) {
+                            addLink(item.quality || item.label || item.title || `Download Option ${idx + 1}`, item.url || item.link || item.download);
+                        }
+                    });
+                }
+
+                // Fallback: Deep recursive scan for any HTTP links
+                if (downloads.length === 0) {
+                    function deepSearchUrls(obj) {
+                        if (!obj) return;
+                        if (typeof obj === 'string' && obj.startsWith('http')) {
+                            if (!obj.match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) {
+                                addLink('Download Media', obj);
+                            } else if (!thumb) {
+                                thumb = obj;
+                            }
+                        } else if (typeof obj === 'object') {
+                            for (let k in obj) deepSearchUrls(obj[k]);
+                        }
+                    }
+                    deepSearchUrls(core);
+
+                    if (downloads.length === 0) {
+                        function deepSearchAnyUrl(obj) {
+                            if (!obj) return;
+                            if (typeof obj === 'string' && obj.startsWith('http')) {
+                                addLink('Download File', obj);
+                            } else if (typeof obj === 'object') {
+                                for (let k in obj) deepSearchAnyUrl(obj[k]);
+                            }
+                        }
+                        deepSearchAnyUrl(core);
+                    }
+                }
+            }
+
+            if (downloads.length === 0) {
+                return { success: false, message: 'Tautan unduhan tidak ditemukan dalam respon API. Silakan coba link lain.' };
+            }
+
+            if (!thumb) {
+                thumb = 'https://placehold.co/600x400/1e293b/818cf8?text=' + encodeURIComponent(platform.name);
+            }
+
+            return {
+                success: true,
+                title: title,
+                author: author,
+                thumb: thumb,
+                downloads: downloads,
+                streamUrl: downloads[0].url
+            };
+        }
+
+        function displayResult(res, platform) {
+            hideAllCards();
+            const card = document.getElementById('result-card');
+            document.getElementById('result-platform-text').textContent = platform.name;
+            document.getElementById('result-title').textContent = res.title;
+            document.getElementById('result-author').textContent = res.author;
+            document.getElementById('result-thumb').src = res.thumb;
+
+            const actionsContainer = document.getElementById('result-download-actions');
+            actionsContainer.innerHTML = '';
+
+            res.downloads.forEach(dl => {
+                const btn = document.createElement('a');
+                btn.href = dl.url;
+                btn.target = '_blank';
+                btn.rel = 'noopener noreferrer';
+                btn.className = 'px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-lg';
+                btn.innerHTML = `<i class="fa-solid fa-download"></i> <span>${dl.label}</span>`;
+                actionsContainer.appendChild(btn);
+            });
+
+            card.classList.remove('hidden');
+            showToast('Tautan berhasil didapatkan!', 'success');
+        }
+
+        function hideAllCards() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('result-card').classList.add('hidden');
+            document.getElementById('error-card').classList.add('hidden');
+        }
+
+        function closeResult() { hideAllCards(); }
+        function resetApp() { clearInput(); hideAllCards(); }
+
+        function saveToHistory(res, platform, inputUrl) {
+            state.history.unshift({
+                id: Date.now(),
+                title: res.title,
+                platform: platform.name,
+                icon: platform.icon,
+                color: platform.color,
+                thumb: res.thumb,
+                url: res.downloads[0].url,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            if (state.history.length > 20) state.history.pop();
+            localStorage.setItem('sf_history', JSON.stringify(state.history));
+            updateHistoryBadge();
+        }
+
+        function updateHistoryBadge() {
+            const badge = document.getElementById('history-badge');
+            if (state.history.length > 0) {
+                badge.textContent = state.history.length;
+                badge.classList.remove('hidden');
+            } else badge.classList.add('hidden');
+        }
+
+        function renderHistoryList() {
+            const container = document.getElementById('history-list');
+            container.innerHTML = '';
+            if (state.history.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">Belum ada riwayat download.</div>`;
+                return;
+            }
+            state.history.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'flex items-center gap-3 p-2.5 rounded-xl bg-slate-900 border border-slate-800';
+                el.innerHTML = `
+                    <img src="${item.thumb}" class="w-10 h-10 rounded-lg object-cover">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-xs font-bold text-slate-200 truncate">${item.title}</h4>
+                        <span class="text-[10px] text-slate-400">${item.platform} • ${item.time}</span>
+                    </div>
+                    <a href="${item.url}" target="_blank" class="p-2 bg-indigo-600 text-white rounded-lg text-xs"><i class="fa-solid fa-download"></i></a>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function openHistoryModal() { renderHistoryList(); document.getElementById('history-modal').classList.remove('hidden'); }
+        function closeHistoryModal() { document.getElementById('history-modal').classList.add('hidden'); }
+        function clearHistory() { state.history = []; localStorage.removeItem('sf_history'); updateHistoryBadge(); renderHistoryList(); }
+
+        function filterCategory(cat) { renderPlatformsGrid(cat); }
+        function renderPlatformsGrid(cat) {
+            const grid = document.getElementById('platforms-grid');
+            grid.innerHTML = '';
+            PLATFORMS.filter(p => !p.adult || state.nsfwEnabled).forEach(p => {
+                const card = document.createElement('div');
+                card.onclick = () => { state.currentPlatform = p.id; document.getElementById('endpoint-select').value = p.id; document.getElementById('url-input').focus(); };
+                card.className = 'glass p-3 rounded-2xl border border-slate-800 hover:border-indigo-500 cursor-pointer flex items-center gap-3';
+                card.innerHTML = `<i class="fa-solid ${p.icon} ${p.color} text-lg"></i><span class="text-xs font-bold text-slate-200">${p.name}</span>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleNSFW() { if (!state.nsfwEnabled) document.getElementById('age-modal').classList.remove('hidden'); else { state.nsfwEnabled = false; localStorage.setItem('sf_nsfw', 'false'); updateNSFWUI(); } }
+        function cancelNSFW() { document.getElementById('age-modal').classList.add('hidden'); }
+        function confirmNSFW() { state.nsfwEnabled = true; localStorage.setItem('sf_nsfw', 'true'); document.getElementById('age-modal').classList.add('hidden'); updateNSFWUI(); }
+        function updateNSFWUI() {
+            document.getElementById('nsfw-status-badge').textContent = state.nsfwEnabled ? 'ON' : 'OFF';
+            renderPlatformsGrid('all');
+        }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+    </script>
+</body>
+</html>
