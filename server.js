@@ -1,10 +1,13 @@
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
@@ -28,11 +31,12 @@ async function tiktokDownloader(tiktokUrl) {
             },
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-            }
+            },
+            timeout: 12000
         });
         return response.data;
     } catch (error) {
-        throw error;
+        throw new Error(error.response?.data?.message || 'Gagal terhubung ke sumber TikTok API.');
     }
 }
 
@@ -47,11 +51,12 @@ async function pinterestDownloader(pinterestUrl) {
             },
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-            }
+            },
+            timeout: 12000
         });
         return response.data;
     } catch (error) {
-        throw error;
+        throw new Error(error.response?.data?.message || 'Gagal terhubung ke sumber Pinterest API.');
     }
 }
 
@@ -70,13 +75,15 @@ app.get('/api/v1/dl', async (req, res) => {
             responseType: 'stream',
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-            }
+            },
+            timeout: 15000
         });
 
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         res.setHeader('Content-Type', response.headers['content-type'] || 'application/octet-stream');
         response.data.pipe(res);
     } catch (err) {
+        console.error('Download proxy error:', err.message);
         res.status(500).send('Gagal mengunduh berkas media');
     }
 });
@@ -118,7 +125,6 @@ app.get('/api/v1/download', async (req, res) => {
 
             const formattedMedia = [];
 
-            // Memproses Video jika ada
             if (Array.isArray(content.videos) && content.videos.length > 0) {
                 content.videos.forEach(v => {
                     if (v.url) {
@@ -130,7 +136,6 @@ app.get('/api/v1/download', async (req, res) => {
                 });
             }
 
-            // Memproses Gambar (Urutkan kualitas: Original, 736x, 564x, 474x)
             if (Array.isArray(content.images) && content.images.length > 0) {
                 const priorityOrder = ['orig', '736x', '564x', '474x', '236x'];
                 const sortedImages = [...content.images].sort((a, b) => {
@@ -190,7 +195,7 @@ app.get('/api/v1/download', async (req, res) => {
                 }
             });
         } else {
-            // TikTok Scraper Handler
+            // TikTok Scraper
             const rawData = await tiktokDownloader(url);
             const data = rawData.data || rawData.result || rawData;
 
@@ -242,16 +247,15 @@ app.get('/api/v1/download', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error Proxy:', error.message);
+        console.error('Error Proxy Handler:', error.message);
         return res.status(500).json({ 
             success: false, 
-            message: 'Gagal memproses media. Pastikan tautan valid dan publik.',
-            error: error.message 
+            message: error.message || 'Gagal memproses media. Pastikan tautan valid.',
         });
     }
 });
 
-// Fallback Proxy
+// Fallback & Static Routes
 app.get('/api/download', (req, res) => {
     res.redirect(`/api/v1/download?url=${encodeURIComponent(req.query.url || '')}`);
 });
@@ -259,6 +263,9 @@ app.get('/api/download', (req, res) => {
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/documentation', (req, res) => res.sendFile(path.join(__dirname, 'documentation.html')));
 
-app.listen(PORT, () => {
-    console.log(`Server ARULZXD berjalan di http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => console.log(`Server ARULZXD berjalan di http://localhost:${PORT}`));
+}
+
+// WAJIB UNTUK VERCEL SERVERLESS FUNCTION
+module.exports = app;

@@ -477,7 +477,16 @@
 
     try {
         const response = await fetch(`/api/v1/download?url=${encodeURIComponent(input)}`);
-        const data = await response.json();
+        
+        // Membaca text dulu untuk menghindari crash SyntaxError jika server mengembalikan HTML
+        const rawText = await response.text();
+        let data = {};
+        
+        try {
+            data = JSON.parse(rawText);
+        } catch (e) {
+            throw new Error('Respon server tidak valid. Silakan coba lagi.');
+        }
 
         if (response.ok && data.success) {
             renderResult(data);
@@ -486,8 +495,8 @@
             showToast(data.message || 'Gagal memproses media. Pastikan URL valid.', 'error');
         }
     } catch (err) {
-        console.error(err);
-        showToast('Gagal terhubung ke server backend.', 'error');
+        console.error('Fetch Error:', err);
+        showToast(err.message || 'Gagal terhubung ke server backend.', 'error');
     } finally {
         setLoadingState(false);
     }
