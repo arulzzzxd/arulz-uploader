@@ -135,7 +135,7 @@
                 <span class="animated-gradient-text">Cepat, Gratis & Tanpa Watermark</span>
             </h2>
             <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto font-normal">
-                Tempel link dari YouTube, TikTok, Instagram, Spotify, Twitter, Pinterest, atau NPM. Opsi format & resolusi akan otomatis muncul.
+                Tempel link dari YouTube, TikTok, Instagram, Spotify, Twitter, Videy, XVideos, XNXX, xHamster, atau NPM. Opsi resolusi & format akan langsung otomatis muncul.
             </p>
 
             <!-- URL SEARCH BAR -->
@@ -245,7 +245,7 @@
                             </div>
                         </div>
 
-                        <!-- Pilihan Resolusi, MP3 / MP4 Ditampilkan Di Sini -->
+                        <!-- Pilihan Tombol Unduhan -->
                         <div class="space-y-2">
                             <span class="text-xs font-semibold text-slate-400 block">Pilih Opsi Unduhan:</span>
                             <div id="result-download-actions" class="flex flex-wrap gap-2 pt-1">
@@ -353,23 +353,23 @@
         const API_KEY = 'haqqiarulz'; // Internal API Key
 
         const PLATFORMS = [
-            { id: 'ytmp4', name: 'YouTube', cat: 'social', icon: 'fa-youtube', color: 'text-red-500', bg: 'bg-red-500/10', pattern: /(youtube\.com|youtu\.be)/i },
-            { id: 'ttdl', name: 'TikTok', cat: 'social', icon: 'fa-tiktok', color: 'text-cyan-400', bg: 'bg-cyan-500/10', pattern: /(tiktok\.com|vt\.tiktok\.com)/i },
-            { id: 'igdl', name: 'Instagram', cat: 'social', icon: 'fa-instagram', color: 'text-pink-500', bg: 'bg-pink-500/10', pattern: /(instagram\.com|instagr\.am)/i },
-            { id: 'fbdl', name: 'Facebook', cat: 'social', icon: 'fa-facebook', color: 'text-blue-500', bg: 'bg-blue-500/10', pattern: /(facebook\.com|fb\.watch|fb\.com)/i },
-            { id: 'spotifydl', name: 'Spotify', cat: 'music', icon: 'fa-spotify', color: 'text-emerald-500', bg: 'bg-emerald-500/10', pattern: /(spotify\.com|open\.spotify\.com)/i },
-            { id: 'pinterestdl', name: 'Pinterest Gambar', cat: 'social', icon: 'fa-pinterest', color: 'text-red-600', bg: 'bg-red-600/10', pattern: /(pinterest\.com|pin\.it)/i },
-            { id: 'pinteresviddl', name: 'Pinterest Video', cat: 'social', icon: 'fa-pinterest-p', color: 'text-red-500', bg: 'bg-red-500/10', pattern: null },
-            { id: 'threads', name: 'Threads', cat: 'social', icon: 'fa-at', color: 'text-slate-200', bg: 'bg-slate-500/10', pattern: /(threads\.net)/i },
-            { id: 'douyindl', name: 'Douyin', cat: 'social', icon: 'fa-video', color: 'text-purple-400', bg: 'bg-purple-500/10', pattern: /(douyin\.com)/i },
-            { id: 'capcut', name: 'CapCut', cat: 'social', icon: 'fa-scissors', color: 'text-sky-400', bg: 'bg-sky-500/10', pattern: /(capcut\.com)/i },
-            { id: 'xdl', name: 'Twitter / X', cat: 'social', icon: 'fa-x-twitter', color: 'text-slate-100', bg: 'bg-slate-500/10', pattern: /(twitter\.com|x\.com)/i },
-            { id: 'videy', name: 'Videy', cat: 'social', icon: 'fa-film', color: 'text-amber-400', bg: 'bg-amber-500/10', pattern: /(videy\.co)/i },
-            { id: 'npmdl', name: 'NPM Package', cat: 'tools', icon: 'fa-npm', color: 'text-red-500', bg: 'bg-red-500/10', pattern: /(npmjs\.com\/package\/|^[a-zA-Z0-9-_\.]+$)/i },
-            { id: 'xvideosdl', name: 'XVideos', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-rose-500', bg: 'bg-rose-500/10', pattern: /(xvideos\.com)/i, adult: true },
-            { id: 'xnxxdl', name: 'XNXX', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-rose-400', bg: 'bg-rose-500/10', pattern: /(xnxx\.com)/i, adult: true },
-            { id: 'xhamsterdl', name: 'XHamster', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-orange-500', bg: 'bg-orange-500/10', pattern: /(xhamster\.com)/i, adult: true },
-            { id: 'pornhubdl', name: 'Pornhub', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-amber-500', bg: 'bg-amber-500/10', pattern: /(pornhub\.com)/i, adult: true }
+            { id: 'ytmp4', name: 'YouTube', cat: 'social', icon: 'fa-youtube', color: 'text-red-500', pattern: /(youtube\.com|youtu\.be)/i },
+            { id: 'ttdl', name: 'TikTok', cat: 'social', icon: 'fa-tiktok', color: 'text-cyan-400', pattern: /(tiktok\.com|vt\.tiktok\.com)/i },
+            { id: 'igdl', name: 'Instagram', cat: 'social', icon: 'fa-instagram', color: 'text-pink-500', pattern: /(instagram\.com|instagr\.am)/i },
+            { id: 'fbdl', name: 'Facebook', cat: 'social', icon: 'fa-facebook', color: 'text-blue-500', pattern: /(facebook\.com|fb\.watch|fb\.com)/i },
+            { id: 'spotifydl', name: 'Spotify', cat: 'music', icon: 'fa-spotify', color: 'text-emerald-500', pattern: /(spotify\.com|open\.spotify\.com)/i },
+            { id: 'pinterestdl', name: 'Pinterest Gambar', cat: 'social', icon: 'fa-pinterest', color: 'text-red-600', pattern: /(pinterest\.com|pin\.it)/i },
+            { id: 'pinteresviddl', name: 'Pinterest Video', cat: 'social', icon: 'fa-pinterest-p', color: 'text-red-500', pattern: null },
+            { id: 'threads', name: 'Threads', cat: 'social', icon: 'fa-at', color: 'text-slate-200', pattern: /(threads\.net)/i },
+            { id: 'douyindl', name: 'Douyin', cat: 'social', icon: 'fa-video', color: 'text-purple-400', pattern: /(douyin\.com)/i },
+            { id: 'capcut', name: 'CapCut', cat: 'social', icon: 'fa-scissors', color: 'text-sky-400', pattern: /(capcut\.com)/i },
+            { id: 'xdl', name: 'Twitter / X', cat: 'social', icon: 'fa-x-twitter', color: 'text-slate-100', pattern: /(twitter\.com|x\.com)/i },
+            { id: 'videy', name: 'Videy', cat: 'social', icon: 'fa-film', color: 'text-amber-400', pattern: /(videy\.co)/i },
+            { id: 'npmdl', name: 'NPM Package', cat: 'tools', icon: 'fa-npm', color: 'text-red-500', pattern: /(npmjs\.com\/package\/|^[a-zA-Z0-9-_\.]+$)/i },
+            { id: 'xvideosdl', name: 'XVideos', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-rose-500', pattern: /(xvideos\.com)/i, adult: true },
+            { id: 'xnxxdl', name: 'XNXX', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-rose-400', pattern: /(xnxx\.com)/i, adult: true },
+            { id: 'xhamsterdl', name: 'XHamster', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-orange-500', pattern: /(xhamster\.com)/i, adult: true },
+            { id: 'pornhubdl', name: 'Pornhub', cat: 'adult', icon: 'fa-triangle-exclamation', color: 'text-amber-500', pattern: /(pornhub\.com)/i, adult: true }
         ];
 
         let state = {
@@ -470,7 +470,7 @@
             try {
                 let parsedResult = { success: false, title: '', author: '', thumb: '', downloads: [] };
 
-                // KHUSUS YOUTUBE: Ambil data Video (ytmp4) dan Audio (ytmp3) secara bersamaan
+                // KHUSUS YOUTUBE: Ambil data Video (ytmp4) & Audio (ytmp3) secara bersamaan
                 if (targetPlatformId === 'ytmp4' || targetPlatformId === 'ytmp3' || /youtube\.com|youtu\.be/i.test(inputVal)) {
                     const [mp4Res, mp3Res] = await Promise.allSettled([
                         fetch(`${API_BASE}/ytmp4?apikey=${API_KEY}&url=${encodeURIComponent(inputVal)}`).then(r => r.json()),
@@ -517,7 +517,7 @@
                         throw new Error('Gagal mengambil data dari YouTube.');
                     }
                 } else {
-                    // UNTUK PLATFORM LAIN (TikTok, IG, dll)
+                    // UNTUK PLATFORM LAIN (TikTok, Twitter, XVideos, XNXX, xHamster, Videy, dll)
                     let apiUrl = `${API_BASE}/${targetPlatformId}?apikey=${API_KEY}`;
                     if (targetPlatformId === 'npmdl') {
                         let pkgName = inputVal.includes('npmjs.com/package/') ? inputVal.split('npmjs.com/package/')[1].split('/')[0] : inputVal;
@@ -545,92 +545,129 @@
             }
         }
 
-        /* DEEP PARSER DINAMIS: Mengekstrak semua opsi resolusi, watermark, dan MP3 */
+        /* PARSER LENGKAP BISA MENANGANI SEMUA STRUKTUR JSON RESPON */
         function parseApiResponse(json, platform) {
             if (!json) return { success: false, message: 'Respon dari server kosong.' };
-            if (json.status === false || json.error) {
-                return { success: false, message: json.message || json.error || 'Gagal dari server.' };
+            if (json.status === false || json.error || json.success === false) {
+                return { success: false, message: json.message || json.error || 'Gagal mengambil data.' };
             }
 
-            let core = json.result || json.data || json.response || json;
+            let core = json.result || json.data || json;
 
-            let title = core.title || core.name || core.caption || core.desc || core.description || `${platform.name} Media`;
-            let author = core.author || core.uploader || core.creator || core.owner || core.nickname || 'ArulzXD';
-            let thumb = core.thumbnail || core.thumb || core.cover || core.origin_cover || core.image || core.preview || '';
+            // Ekstraksi Judul
+            let title = core.title || (core.video && core.video.title) || core.text || core.caption || json.title || `${platform.name} Media`;
 
-            if (typeof author === 'object') author = author.nickname || author.name || author.username || 'ArulzXD';
+            // Ekstraksi Author / Uploader
+            let author = 'ArulzXD';
+            if (core.author) {
+                author = typeof core.author === 'object' ? (core.author.nickname || core.author.fullname || core.author.name || core.author.username || 'ArulzXD') : core.author;
+            } else if (core.video && core.video.author) {
+                author = core.video.author;
+            } else if (json.author) {
+                author = typeof json.author === 'object' ? (json.author.nickname || json.author.fullname || json.author.name) : json.author;
+            }
+
+            // Ekstraksi Thumbnail
+            let thumb = core.thumbnail || core.thumb || core.image || core.cover || (core.video && core.video.thumbnail) || json.cover || '';
+            if (!thumb && core.media && Array.isArray(core.media) && core.media[0]) {
+                thumb = core.media[0].preview || core.media[0].thumbnail || '';
+            }
 
             let downloads = [];
 
             function addLink(label, url, type = 'mp4') {
                 if (!url || typeof url !== 'string' || !url.startsWith('http')) return;
                 if (!downloads.some(d => d.url === url)) {
-                    downloads.push({ label: label || 'Download', url, type });
+                    downloads.push({ label, url, type });
                 }
             }
 
+            // 1. Direct fileurl (Videy)
+            if (json.fileurl) addLink('🎬 Download Video', json.fileurl, 'mp4');
+
+            // 2. TikTok v1 (ttdl)
+            if (core.video_tanpa_watermark) addLink('🎬 Video No Watermark', core.video_tanpa_watermark, 'mp4');
+            if (core.audio_mp3) addLink('🎵 Audio (MP3)', core.audio_mp3, 'mp3');
+
+            // 3. TikTok v2 (ttdlv2)
+            if (json.media && Array.isArray(json.media)) {
+                json.media.forEach(m => {
+                    let lbl = '🎬 Video';
+                    if (m.type === 'nowatermark_hd') lbl = '🎬 HD No Watermark';
+                    else if (m.type === 'nowatermark') lbl = '🎬 No Watermark';
+                    else if (m.type === 'watermark') lbl = '🎬 Watermark';
+                    addLink(lbl, m.url, 'mp4');
+                });
+            }
+            if (json.music_info && json.music_info.url) {
+                addLink('🎵 Audio (MP3)', json.music_info.url, 'mp3');
+            }
+
+            // 4. Twitter / X (xdl)
+            if (core.media && Array.isArray(core.media)) {
+                core.media.forEach(m => {
+                    if (m.variants && Array.isArray(m.variants)) {
+                        m.variants.forEach(v => {
+                            if (v.content_type === 'video/mp4' && v.url) {
+                                let label = '🎬 Video';
+                                if (v.bitrate) {
+                                    if (v.bitrate >= 2000000) label = '🎬 Video HD (720p/1080p)';
+                                    else if (v.bitrate >= 800000) label = '🎬 Video SD (360p/480p)';
+                                    else label = '🎬 Video Low (270p)';
+                                }
+                                addLink(label, v.url, 'mp4');
+                            }
+                        });
+                    }
+                    if (m.download_url) addLink('🎬 Download Video', m.download_url, 'mp4');
+                });
+            }
+
+            // 5. XVideos & XNXX downloads object ({ low, high, hls/hsl })
+            if (core.downloads && typeof core.downloads === 'object' && !Array.isArray(core.downloads)) {
+                if (core.downloads.high && core.downloads.high.url) {
+                    let sz = core.downloads.high.size ? ` (${core.downloads.high.size})` : '';
+                    addLink(`🎬 High Quality 360p${sz}`, core.downloads.high.url, 'mp4');
+                }
+                if (core.downloads.low && core.downloads.low.url) {
+                    let sz = core.downloads.low.size ? ` (${core.downloads.low.size})` : '';
+                    addLink(`🎬 Low Quality 240p${sz}`, core.downloads.low.url, 'mp4');
+                }
+                if (core.downloads.hls && core.downloads.hls.url) addLink('📺 HLS Stream', core.downloads.hls.url, 'm3u8');
+                if (core.downloads.hsl && core.downloads.hsl.url) addLink('📺 HLS Stream', core.downloads.hsl.url, 'm3u8');
+            }
+
+            // 6. xHamster / Array downloads with download_url
+            if (core.downloads && Array.isArray(core.downloads)) {
+                core.downloads.forEach((item, idx) => {
+                    if (typeof item === 'string') {
+                        addLink(`🎬 Video ${idx + 1}`, item, 'mp4');
+                    } else if (item && typeof item === 'object') {
+                        let lbl = item.title || item.quality || item.label || `Video ${idx + 1}`;
+                        addLink(`🎬 ${lbl}`, item.download_url || item.url || item.download, 'mp4');
+                    }
+                });
+            }
+
+            // 7. YTmp4 & YTmp3 download field
+            if (core.download) {
+                if (typeof core.download === 'string') {
+                    let q = core.quality ? ` (${core.quality}p)` : '';
+                    addLink(`🎬 Download Video${q}`, core.download, 'mp4');
+                } else if (typeof core.download === 'object' && core.download.url) {
+                    let q = core.download.quality ? ` (${core.download.quality})` : '';
+                    let isMp3 = core.download.type === 'audio/mp3' || core.download.url.includes('.mp3');
+                    addLink(isMp3 ? `🎵 Audio MP3${q}` : `🎬 Video MP4${q}`, core.download.url, isMp3 ? 'mp3' : 'mp4');
+                }
+            }
+
+            // 8. General Direct Fallback
             if (typeof core === 'string' && core.startsWith('http')) {
                 addLink('🎬 Download Direct', core, 'mp4');
             }
 
-            if (typeof core === 'object' && core !== null) {
-                // TikTok
-                addLink('🎬 HD No Watermark', core.hdplay || core.hd || core.no_watermark_hd, 'mp4');
-                addLink('🎬 No Watermark', core.play || core.nowm || core.no_watermark || core.nowatermark, 'mp4');
-                addLink('🎬 Watermark', core.wmplay || core.wm || core.watermark || core.with_watermark, 'mp4');
-                addLink('🎵 Audio (MP3)', core.music || core.audio || core.mp3 || core.music_url, 'mp3');
-
-                if (core.video && typeof core.video === 'object') {
-                    addLink('🎬 HD No Watermark', core.video.hd || core.video.noWatermark_hd, 'mp4');
-                    addLink('🎬 No Watermark', core.video.noWatermark || core.video.url || core.video.link, 'mp4');
-                    addLink('🎬 Watermark', core.video.watermark || core.video.sd, 'mp4');
-                } else if (typeof core.video === 'string') {
-                    addLink('🎬 Download Video', core.video, 'mp4');
-                }
-
-                // Opsi Resolusi Kualitas
-                const resKeys = ['1080p', '1080', '720p', '720', '480p', '480', '360p', '360', '240p', '240', '144p', '144', 'hd', 'sd', 'low', 'high', 'quality_1080p', 'quality_720p'];
-                resKeys.forEach(k => {
-                    if (core[k]) {
-                        let label = k.toLowerCase().includes('p') ? `🎬 Video ${k}` : (isNaN(k) ? `🎬 Video ${k.toUpperCase()}` : `🎬 Video ${k}p`);
-                        addLink(label, typeof core[k] === 'string' ? core[k] : (core[k].url || core[k].link), 'mp4');
-                    }
-                });
-
-                // Array opsi bawaan dari API
-                const list = core.downloads || core.urls || core.links || core.media || core.formats || core.qualities || (Array.isArray(core) ? core : null);
-                if (Array.isArray(list)) {
-                    list.forEach((item, idx) => {
-                        if (typeof item === 'string') {
-                            const isMp3 = item.includes('.mp3');
-                            addLink(isMp3 ? `🎵 Audio MP3 ${idx + 1}` : `🎬 Video Option ${idx + 1}`, item, isMp3 ? 'mp3' : 'mp4');
-                        } else if (typeof item === 'object' && item !== null) {
-                            let itemLabel = item.quality || item.resolution || item.format || item.label || item.title || (item.height ? `Video ${item.height}p` : `Option ${idx + 1}`);
-                            let itemType = (item.type || '').includes('audio') || (itemLabel || '').toLowerCase().includes('audio') || (item.url || '').includes('.mp3') ? 'mp3' : 'mp4';
-                            let prefix = itemType === 'mp3' ? '🎵 ' : '🎬 ';
-                            addLink(`${prefix}${itemLabel}`, item.url || item.link || item.download, itemType);
-                        }
-                    });
-                }
-
-                // Fallback Scanner
-                if (downloads.length === 0) {
-                    for (let key in core) {
-                        if (typeof core[key] === 'string' && core[key].startsWith('http')) {
-                            if (!core[key].match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) {
-                                let formatKey = key.replace(/_/g, ' ').toUpperCase();
-                                let isMp3 = core[key].includes('.mp3');
-                                addLink(`${isMp3 ? '🎵' : '🎬'} Download (${formatKey})`, core[key], isMp3 ? 'mp3' : 'mp4');
-                            } else if (!thumb) {
-                                thumb = core[key];
-                            }
-                        }
-                    }
-                }
-            }
-
             if (downloads.length === 0) {
-                return { success: false, message: 'Tautan unduhan tidak ditemukan dalam respon API. Silakan coba link lain.' };
+                return { success: false, message: 'Tautan unduhan tidak ditemukan dalam respon API.' };
             }
 
             if (!thumb) {
@@ -642,8 +679,7 @@
                 title: title,
                 author: author,
                 thumb: thumb,
-                downloads: downloads,
-                streamUrl: downloads[0].url
+                downloads: downloads
             };
         }
 
@@ -711,7 +747,7 @@
             const actionsContainer = document.getElementById('result-download-actions');
             actionsContainer.innerHTML = '';
 
-            // Menampilkan semua tombol pilihan resolusi/format sekaligus
+            // Render semua tombol pilihan kualitas & MP3 secara terpisah
             res.downloads.forEach(dl => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
