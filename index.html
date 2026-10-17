@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id" class="theme-light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARULZXD Extractor - Pro Media Downloader</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        neoYellow: 'var(--neo-yellow)',
+                        neoPink: 'var(--neo-pink)',
+                        neoCyan: 'var(--neo-cyan)',
+                        neoGreen: 'var(--neo-green)',
+                        neoBg: 'var(--neo-bg)',
+                        neoCard: 'var(--neo-card)',
+                        neoText: 'var(--neo-text)',
+                        neoBorder: 'var(--neo-border)',
+                    },
+                    boxShadow: {
+                        'neo': '5px 5px 0px var(--neo-border)',
+                        'neo-sm': '3px 3px 0px var(--neo-border)',
+                        'neo-lg': '8px 8px 0px var(--neo-border)',
+                        'neo-active': '1px 1px 0px var(--neo-border)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --neo-bg: #FAF7F0;
+            --neo-card: #FFFFFF;
+            --neo-text: #0F172A;
+            --neo-border: #000000;
+            --neo-yellow: #FFE600;
+            --neo-pink: #FF5A5F;
+            --neo-cyan: #00E5FF;
+            --neo-green: #00E676;
+            --neo-muted: #64748B;
+        }
+
+        .theme-dark {
+            --neo-bg: #0F111A;
+            --neo-card: #181A26;
+            --neo-text: #F1F5F9;
+            --neo-border: #000000;
+            --neo-yellow: #FFD600;
+            --neo-pink: #FF3366;
+            --neo-cyan: #00E5FF;
+            --neo-green: #00E676;
+            --neo-muted: #94A3B8;
+        }
+
+        body {
+            background-color: var(--neo-bg);
+            color: var(--neo-text);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .neo-box {
+            background-color: var(--neo-card);
+            border: 3px solid var(--neo-border);
+            box-shadow: 5px 5px 0px var(--neo-border);
+            border-radius: 14px;
+        }
+
+        .neo-btn {
+            background-color: var(--neo-yellow);
+            color: #000000;
+            border: 3px solid var(--neo-border);
+            box-shadow: 4px 4px 0px var(--neo-border);
+            font-weight: 800;
+            border-radius: 10px;
+            transition: all 0.1s ease;
+        }
+
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--neo-border);
+        }
+
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--neo-border);
+        }
+
+        .neo-input {
+            background-color: var(--neo-card);
+            border: 3px solid var(--neo-border);
+            box-shadow: 4px 4px 0px var(--neo-border);
+            border-radius: 12px;
+            color: var(--neo-text);
+            outline: none;
+        }
+
+        .neo-input:focus {
+            box-shadow: 6px 6px 0px var(--neo-border);
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 1; }
+        }
+
+        .pulse-dot {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+
+        .spin {
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased pb-12 selection:bg-neoYellow selection:text-black">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-5xl mx-auto px-4 pt-6 pb-4">
+        <div class="neo-box p-4 flex flex-wrap items-center justify-between gap-4">
+            
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-11 h-11 bg-neoYellow border-3 border-black rounded-xl shadow-neo-sm flex items-center justify-center font-display font-black text-lg group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
+                    AXD
+                </div>
+                <div>
+                    <div class="font-display font-black text-xl tracking-tight leading-none flex items-center gap-1.5">
+                        ARULZXD <span class="bg-neoPink text-black text-xs px-2 py-0.5 border-2 border-black rounded-md uppercase font-bold">PRO</span>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500 tracking-wider">MEDIA EXTRACTOR</span>
+                </div>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-2 bg-neoCard border-2 border-black px-3 py-1.5 rounded-lg shadow-neo-sm">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-neoGreen opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-neoGreen"></span>
+                    </span>
+                    <span class="text-xs font-black tracking-wide">API ONLINE</span>
+                </div>
+
+                <button onclick="toggleTheme()" title="Ubah Tema Visual" class="w-10 h-10 bg-neoCyan border-2 border-black rounded-lg shadow-neo-sm flex items-center justify-center hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all">
+                    <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                </button>
+
+                <a href="API Integration Documentation.html" class="neo-btn px-4 py-2 text-xs flex items-center gap-2 bg-neoYellow">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="16 18 22 12 16 6"/>
+                        <polyline points="8 6 2 12 8 18"/>
+                    </svg>
+                    <span>DOKUMENTASI API</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <main class="w-full max-w-4xl mx-auto px-4 mt-6 flex-grow flex flex-col gap-8">
+        
+        <section class="text-center relative pt-4 pb-2">
+            <div class="inline-flex items-center gap-2 bg-neoPink text-black border-2 border-black px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase mb-4 shadow-neo-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span>FASTER & CLEANER EXTRACTOR</span>
+            </div>
+
+            <h1 class="font-display text-3xl sm:text-5xl font-black uppercase tracking-tight leading-tight mb-4">
+                SATU TAUTAN.<br>
+                <span class="bg-neoYellow px-3 py-1 rounded-lg border-3 border-black inline-block shadow-neo-sm transform -rotate-1 mt-1">SEMUA PLATFORM.</span>
+            </h1>
+
+            <p class="text-sm sm:text-base font-semibold text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
+                Tempel link media sosial di bawah. Sistem otomatis mendeteksi platform dan menyediakan unduhan video HD tanpa watermark serta audio MP3 secara instan.
+            </p>
+        </section>
+
+        <!-- Input Box -->
+        <section class="neo-box p-6 sm:p-8 bg-neoCard relative">
+            <div id="detector-badge" class="hidden items-center gap-2 mb-4">
+                <span class="text-xs font-black uppercase tracking-wider text-slate-500">Platform Terdeteksi:</span>
+                <div id="detector-pill" class="flex items-center gap-1.5 px-3 py-1 bg-neoYellow border-2 border-black rounded-md text-xs font-black shadow-neo-sm">
+                    <span id="detector-name">TIKTOK</span>
+                </div>
+            </div>
+
+            <div class="relative flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-black pointer-events-none">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                    </div>
+
+                    <input 
+                        type="url" 
+                        id="media-url" 
+                        class="neo-input w-full pl-12 pr-20 py-4 font-bold text-sm sm:text-base placeholder:text-slate-400" 
+                        placeholder="Tempel tautan TikTok, YouTube, Instagram, Douyin..."
+                        autocomplete="off"
+                        oninput="handleInput(this.value)"
+                    />
+
+                    <button 
+                        id="clear-btn" 
+                        onclick="clearInput()" 
+                        class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-200 border-2 border-black rounded-lg items-center justify-center hover:bg-red-300 transition-colors"
+                        title="Bersihkan Tautan"
+                    >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <button 
+                    onclick="pasteFromClipboard()" 
+                    class="neo-btn px-5 py-4 bg-neoCyan flex items-center justify-center gap-2 text-sm uppercase shrink-0"
+                >
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                    </svg>
+                    <span>TEMPEL</span>
+                </button>
+            </div>
+
+            <button 
+                id="process-btn" 
+                onclick="processMedia()" 
+                class="neo-btn w-full mt-4 py-4 bg-neoYellow text-black text-base tracking-wider uppercase flex items-center justify-center gap-3 cursor-pointer"
+            >
+                <svg id="btn-icon-process" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 8 8 12 12 16"/>
+                    <line x1="16" y1="12" x2="8" y2="12"/>
+                </svg>
+                <svg id="btn-icon-spinner" class="hidden w-6 h-6 spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-6.21-8.58"/>
+                </svg>
+                <span id="btn-text">PROSES MEDIA SEKARANG</span>
+            </button>
+        </section>
+
+        <!-- Preview Card -->
+        <section id="result-card" class="hidden neo-box p-6 bg-neoCard border-3 border-black">
+            <div class="flex items-center justify-between border-b-3 border-black pb-4 mb-5">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-neoGreen rounded-full border-2 border-black"></span>
+                    <h3 class="font-display font-black text-lg uppercase tracking-wide">HASIL EKSTRAKSI MEDIA</h3>
+                </div>
+                <span id="result-type-tag" class="text-xs font-black bg-neoYellow border-2 border-black px-2.5 py-1 rounded-md uppercase">TIKTOK VIDEO</span>
+            </div>
+
+            <div id="author-container" class="flex items-center gap-3 mb-4"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                <div class="md:col-span-5 relative">
+                    <div class="neo-box overflow-hidden bg-black aspect-video md:aspect-square flex items-center justify-center relative">
+                        <img id="res-thumb" src="" alt="Media Thumbnail" class="w-full h-full object-cover"/>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 flex flex-col justify-between gap-4">
+                    <div>
+                        <h2 id="res-title" class="font-display font-black text-lg sm:text-xl leading-snug mb-3"></h2>
+                        <div id="res-stats" class="flex justify-between bg-slate-100 dark:bg-slate-800 border-2 border-black rounded-lg p-2.5 mb-4 text-xs font-black"></div>
+                    </div>
+
+                    <div id="res-actions" class="flex flex-col gap-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Platform Didukung -->
+        <section class="mt-2">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-neoYellow border-2 border-black rounded-sm"></div>
+                    <h2 class="font-display font-black text-xl uppercase">PLATFORM DIDUKUNG</h2>
+                </div>
+                <span class="text-xs font-extrabold bg-neoCyan border-2 border-black px-2.5 py-1 rounded-md">6 OTOMATIS</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- TikTok Card -->
+                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-black text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.525.001c1.31 0 2.61.115 3.841.348V5.01a8.03 8.03 0 01-2.221-.302c-1.127-.302-1.93-.972-1.93-2.203V0h.31zm3.84 5.358c1.378 1.042 2.923 1.706 4.635 1.832v4.205a11.96 11.96 0 01-4.635-1.042v6.62c0 4.135-3.353 7.488-7.488 7.488S1.389 21.147 1.389 17.012c0-4.135 3.354-7.488 7.489-7.488.463 0 .915.042 1.354.125V14.1a3.292 3.292 0 00-1.354-.286c-1.815 0-3.287 1.472-3.287 3.287 0 1.815 1.472 3.287 3.287 3.287 1.815 0 3.287-1.472 3.287-3.287V.001h4.202v5.358z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-black bg-neoYellow border-2 border-black px-2 py-0.5 rounded uppercase">POPULER</span>
+                        </div>
+                        <h3 class="font-display font-black text-base mb-1">TIKTOK</h3>
+                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Download video tanpa watermark, kualitas HD 1080p, dan ekstraksi audio MP3.</p>
+                    </div>
+                </div>
+
+                <!-- YouTube Card -->
+                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-red-600 text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-black bg-neoPink text-white border-2 border-black px-2 py-0.5 rounded uppercase">SHORTS & MP3</span>
+                        </div>
+                        <h3 class="font-display font-black text-base mb-1">YOUTUBE</h3>
+                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Unduh Shorts & Video reguler resolusi hingga 1080p, atau konversi ke MP3.</p>
+                    </div>
+                </div>
+
+                <!-- Instagram Card -->
+                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-black bg-neoCyan border-2 border-black px-2 py-0.5 rounded uppercase">REELS</span>
+                        </div>
+                        <h3 class="font-display font-black text-base mb-1">INSTAGRAM</h3>
+                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Simpan Reels, Video postingan, dan carousel foto resolusi tinggi.</p>
+                    </div>
+                </div>
+
+                <!-- Douyin Card -->
+                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-slate-900 text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.525.001c1.31 0 2.61.115 3.841.348V5.01a8.03 8.03 0 01-2.221-.302c-1.127-.302-1.93-.972-1.93-2.203V0h.31zm3.84 5.358c1.378 1.042 2.923 1.706 4.635 1.832v4.205a11.96 11.96 0 01-4.635-1.042v6.62c0 4.135-3.353 7.488-7.488 7.488S1.389 21.147 1.389 17.012c0-4.135 3.354-7.488 7.489-7.488.463 0 .915.042 1.354.125V14.1a3.292 3.292 0 00-1.354-.286c-1.815 0-3.287 1.472-3.287 3.287 0 1.815 1.472 3.287 3.287 3.287 1.815 0 3.287-1.472 3.287-3.287V.001h4.202v5.358z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-black bg-neoGreen border-2 border-black px-2 py-0.5 rounded uppercase">ASIA</span>
+                        </div>
+                        <h3 class="font-display font-black text-base mb-1">DOUYIN</h3>
+                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">TikTok versi Tiongkok. Ekstraksi penuh tanpa watermark.</p>
+                    </div>
+                </div>
+
+                <!-- Pinterest Card -->
+                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-red-700 text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-black bg-neoYellow border-2 border-black px-2 py-0.5 rounded uppercase">PINS</span>
+                        </div>
+                        <h3 class="font-display font-black text-base mb-1">PINTEREST</h3>
+                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Unduh video Pin inspiratif dan gambar resolusi penuh.</p>
+                    </div>
+                </div>
+
+                <!-- Facebook Card -->
+                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-blue-600 text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-black bg-neoPink text-white border-2 border-black px-2 py-0.5 rounded uppercase">PUBLIC</span>
+                        </div>
+                        <h3 class="font-display font-black text-base mb-1">FACEBOOK</h3>
+                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Simpan video publik, Watch, dan Reels Facebook kualitas SD & HD.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="w-full max-w-4xl mx-auto px-4 mt-12 text-center text-xs font-black">
+        ARULZXD EXTRACTOR &copy; 2026. ALL RIGHTS RESERVED.
+    </footer>
+
+    <!-- Logic Engine -->
+    <script>
+        let currentTheme = 'light';
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (currentTheme === 'light') {
+                html.className = 'theme-dark dark';
+                currentTheme = 'dark';
+                showToast('Tema Cyber Dark Aktif', 'info');
+            } else {
+                html.className = 'theme-light';
+                currentTheme = 'light';
+                showToast('Tema Retro Warm Aktif', 'info');
+            }
+        }
+
+        function handleInput(url) {
+            const clearBtn = document.getElementById('clear-btn');
+            const badge = document.getElementById('detector-badge');
+            const nameEl = document.getElementById('detector-name');
+
+            if (url.trim() !== '') {
+                clearBtn.classList.remove('hidden');
+                clearBtn.classList.add('flex');
+
+                if (/tiktok\.com/i.test(url)) {
+                    badge.classList.remove('hidden');
+                    badge.classList.add('flex');
+                    nameEl.innerText = 'TIKTOK';
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } else {
+                clearBtn.classList.add('hidden');
+                badge.classList.add('hidden');
+            }
+        }
+
+        function clearInput() {
+            const input = document.getElementById('media-url');
+            input.value = '';
+            handleInput('');
+            input.focus();
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    const input = document.getElementById('media-url');
+                    input.value = text;
+                    handleInput(text);
+                    showToast('Tautan berhasil ditempel dari clipboard!', 'success');
+                }
+            } catch (err) {
+                showToast('Izinkan akses clipboard di browser Anda', 'error');
+            }
+        }
+
+        async function processMedia() {
+            const input = document.getElementById('media-url').value.trim();
+            if (!input) {
+                showToast('Silakan tempel tautan media terlebih dahulu!', 'error');
+                return;
+            }
+
+            setLoadingState(true);
+
+            try {
+                const response = await fetch(`/api/v1/download?url=${encodeURIComponent(input)}`);
+                const data = await response.json();
+
+                if (data.success || data.result) {
+                    const result = data.data || data;
+                    renderResult(result);
+                    showToast('Media berhasil diekstraksi!', 'success');
+                } else {
+                    showToast('Gagal memproses media. Pastikan URL valid.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Terjadi kesalahan koneksi server.', 'error');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function renderResult(data) {
+            const card = document.getElementById('result-card');
+            const authorContainer = document.getElementById('author-container');
+            const thumb = document.getElementById('res-thumb');
+            const title = document.getElementById('res-title');
+            const stats = document.getElementById('res-stats');
+            const actions = document.getElementById('res-actions');
+
+            if (data.author) {
+                authorContainer.innerHTML = `
+                    <img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${data.author.avatar}" alt="${data.author.nickname}">
+                    <div>
+                        <div class="font-extrabold text-sm">${data.author.nickname || ''}</div>
+                        <div class="text-xs font-bold text-slate-500">@${data.author.fullname || ''}</div>
+                    </div>
+                `;
+            }
+
+            thumb.src = data.cover || '';
+            title.innerText = data.title || 'Video TikTok Terpilih';
+
+            if (data.stats) {
+                stats.innerHTML = `
+                    <span>VIEWS: ${data.stats.views || '0'}</span>
+                    <span>LIKES: ${data.stats.likes || '0'}</span>
+                    <span>DURATION: ${data.duration || '-'}</span>
+                `;
+            }
+
+            actions.innerHTML = '';
+
+            if (Array.isArray(data.media)) {
+                data.media.forEach(item => {
+                    let label = 'DOWNLOAD MP4';
+                    let bg = 'bg-neoYellow';
+                    if (item.type === '') {
+                        label = 'WATERMARK MP4';
+                        bg = 'bg-neoCyan';
+                    } else if (item.type === 'nowatermark') {
+                        label = 'NOWATERMARK MP4';
+                        bg = 'bg-neoYellow';
+                    } else if (item.type === 'nowatermark_hd') {
+                        label = 'NOWATERMARK HD MP4';
+                        bg = 'bg-neoGreen';
+                    }
+
+                    actions.innerHTML += `
+                        <a href="${item.url}" download class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase">
+                            <span>${label}</span>
+                        </a>
+                    `;
+                });
+            }
+
+            if (data.music_info && data.music_info.url) {
+                actions.innerHTML += `
+                    <a href="${data.music_info.url}" download class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase">
+                        <span>DOWNLOAD MP3 AUDIO</span>
+                    </a>
+                `;
+            }
+
+            card.classList.remove('hidden');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function setLoadingState(isLoading) {
+            const btn = document.getElementById('process-btn');
+            const text = document.getElementById('btn-text');
+            const iconProcess = document.getElementById('btn-icon-process');
+            const iconSpinner = document.getElementById('btn-icon-spinner');
+
+            if (isLoading) {
+                btn.disabled = true;
+                text.innerText = 'MEMPROSES MEDIA...';
+                iconProcess.classList.add('hidden');
+                iconSpinner.classList.remove('hidden');
+            } else {
+                btn.disabled = false;
+                text.innerText = 'PROSES MEDIA SEKARANG';
+                iconProcess.classList.remove('hidden');
+                iconSpinner.classList.add('hidden');
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bg = 'bg-neoYellow';
+            if (type === 'error') bg = 'bg-neoPink text-white';
+            if (type === 'success') bg = 'bg-neoGreen text-black';
+
+            toast.className = `neo-box ${bg} p-3 text-xs font-black flex items-center justify-between gap-3 shadow-neo-sm pointer-events-auto transform transition-all duration-200 translate-y-2 opacity-0`;
+            
+            toast.innerHTML = `
+                <span>${msg}</span>
+                <button onclick="this.parentElement.remove()" class="font-extrabold text-sm">✕</button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 200);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
