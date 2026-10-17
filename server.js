@@ -18,9 +18,9 @@ function generate20Digits() {
     return result;
 }
 
-// Scraper TikTok API (ttdlv2)
+// Scraper TikTok API (ttdl)
 async function tiktokDownloader(tiktokUrl) {
-    const apiUrl = 'https://api.arulzzxd.my.id/api/download/ttdlv2';
+    const apiUrl = 'https://api.arulzzxd.my.id/api/download/ttdl';
     try {
         const response = await axios.get(apiUrl, {
             params: {
@@ -64,7 +64,7 @@ app.get('/api/v1/download', async (req, res) => {
     
     if (!url) {
         return res.status(400).json({ 
-            success: false, 
+            status: false, 
             message: 'Parameter URL media wajib diisi' 
         });
     }
@@ -78,7 +78,7 @@ app.get('/api/v1/download', async (req, res) => {
 
             if (!resObj) {
                 return res.status(400).json({
-                    success: false,
+                    status: false,
                     message: 'Gagal mengekstrak data dari Pinterest.'
                 });
             }
@@ -89,7 +89,6 @@ app.get('/api/v1/download', async (req, res) => {
 
             const formattedMedia = [];
 
-            // Memproses Video
             if (Array.isArray(content.videos) && content.videos.length > 0) {
                 content.videos.forEach(v => {
                     if (v.url) {
@@ -101,7 +100,6 @@ app.get('/api/v1/download', async (req, res) => {
                 });
             }
 
-            // Memproses Gambar (Prioritas Original -> Resolution)
             if (Array.isArray(content.images) && content.images.length > 0) {
                 const priorityOrder = ['orig', '736x', '564x', '474x', '236x'];
                 const sortedImages = [...content.images].sort((a, b) => {
@@ -137,90 +135,39 @@ app.get('/api/v1/download', async (req, res) => {
             }
 
             return res.json({
-                success: true,
+                status: true,
                 platform: 'PINTEREST',
-                title: displayTitle,
-                taken_at: post.createdAt || new Date().toLocaleString(),
-                region: 'US',
-                id: generate20Digits(),
-                duration: '-',
-                cover: coverUrl,
-                media: formattedMedia,
-                stats: {
-                    views: '-',
-                    likes: String(post.likesCount || 0),
-                    comment: String(post.commentCount || 0),
-                    share: '-',
-                    download: '-'
-                },
-                author: {
-                    fullname: user.username || 'pinterest_user',
-                    nickname: user.fullName || 'Pinterest Creator',
-                    avatar: coverUrl
+                data: {
+                    caption: displayTitle,
+                    author: user.fullName || user.username || 'Pinterest Creator',
+                    cover: coverUrl,
+                    media: formattedMedia
                 }
             });
         } else {
-            // TikTok Scraper Handler (Langsung Tanpa Proxy)
+            // Handler TikTok (Pengembalian Format Struktur { status, data })
             const rawData = await tiktokDownloader(url);
 
-            if (!rawData || (!rawData.success && !rawData.status && !rawData.media)) {
+            if (!rawData || !rawData.status || !rawData.data) {
                 return res.status(400).json({
-                    success: false,
-                    message: rawData?.message || 'Gagal memproses video TikTok. Pastikan akun tidak diprivate.'
-                });
-            }
-
-            const formattedMedia = [];
-
-            if (Array.isArray(rawData.media)) {
-                rawData.media.forEach(m => {
-                    let label = 'DOWNLOAD MP4';
-                    if (m.type === 'nowatermark') label = 'NO WATERMARK MP4';
-                    else if (m.type === 'nowatermark_hd') label = 'NO WATERMARK HD MP4';
-                    else if (m.type === 'watermark') label = 'WATERMARK MP4';
-
-                    if (m.url) {
-                        formattedMedia.push({
-                            type: label,
-                            url: m.url
-                        });
-                    }
+                    status: false,
+                    message: 'Gagal memproses video TikTok. Pastikan tautan valid.'
                 });
             }
 
             return res.json({
-                success: true,
-                platform: 'TIKTOK',
-                title: rawData.title || 'Video TikTok',
-                taken_at: rawData.taken_at || new Date().toLocaleString(),
-                region: rawData.region || 'ID',
-                id: rawData.id || generate20Digits(),
-                duration: rawData.duration || '-',
-                cover: rawData.cover || '',
-                media: formattedMedia,
-                music_info: (rawData.music_info && rawData.music_info.url) ? {
-                    id: rawData.music_info.id || generate20Digits(),
-                    title: rawData.music_info.title || 'Original Sound',
-                    author: rawData.music_info.author || 'Unknown',
-                    url: rawData.music_info.url
-                } : null,
-                stats: {
-                    views: String(rawData.stats?.views || '0'),
-                    likes: String(rawData.stats?.likes || '0'),
-                    comment: String(rawData.stats?.comment || '0'),
-                    share: String(rawData.stats?.share || '0'),
-                    download: String(rawData.stats?.download || '0')
-                },
-                author: {
-                    fullname: rawData.author?.fullname || 'user',
-                    nickname: rawData.author?.nickname || 'TikTok Creator',
-                    avatar: rawData.author?.avatar || ''
+                status: true,
+                data: {
+                    video_tanpa_watermark: rawData.data.video_tanpa_watermark || '',
+                    audio_mp3: rawData.data.audio_mp3 || '',
+                    caption: rawData.data.caption || '',
+                    author: rawData.data.author || ''
                 }
             });
         }
     } catch (error) {
         return res.status(500).json({ 
-            success: false, 
+            status: false, 
             message: error.message || 'Gagal memproses media.',
         });
     }
