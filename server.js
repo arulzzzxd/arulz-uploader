@@ -18,31 +18,63 @@ function generate20Digits() {
     return result;
 }
 
-async function tiktokDownloader(tiktokUrl) {
-    const apiUrl = 'https://api.arulzzxd.my.id/api/download/ttdlv2';
+// Helper untuk memperpanjang shortlink (vt.tiktok.com / pin.it)
+async function expandUrl(shortUrl) {
     try {
-        const response = await axios.get(apiUrl, {
-            params: {
-                url: tiktokUrl,
-                apikey: 'haqqiarulz'
-            },
+        const response = await axios.get(shortUrl, {
+            maxRedirects: 5,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
             },
-            timeout: 12000
+            timeout: 7000
         });
-        return response.data;
-    } catch (error) {
-        throw new Error('Gagal terhubung ke sumber TikTok API.');
+        return response.request.res.responseUrl || shortUrl;
+    } catch (e) {
+        return shortUrl;
     }
 }
 
+// Scraper TikTok API dengan Fallback Multi-Endpoint
+async function tiktokDownloader(tiktokUrl) {
+    const fullUrl = await expandUrl(tiktokUrl);
+    const endpoints = [
+        'https://api.arulzzxd.my.id/api/download/ttdlv2',
+        'https://api.arulzzxd.my.id/api/download/ttdl',
+        'https://api.arulzzxd.my.id/api/download/tiktok'
+    ];
+
+    for (const apiUrl of endpoints) {
+        try {
+            const response = await axios.get(apiUrl, {
+                params: {
+                    url: fullUrl,
+                    apikey: 'haqqiarulz'
+                },
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                },
+                timeout: 10000
+            });
+
+            const resData = response.data;
+            if (resData && (resData.status === true || resData.success === true || resData.result || resData.data)) {
+                return resData;
+            }
+        } catch (error) {
+            continue;
+        }
+    }
+    throw new Error('Gagal mengambil data dari server TikTok API.');
+}
+
+// Scraper Pinterest API
 async function pinterestDownloader(pinterestUrl) {
+    const fullUrl = await expandUrl(pinterestUrl);
     const apiUrl = 'https://api.arulzzxd.my.id/api/download/pinterestdl';
     try {
         const response = await axios.get(apiUrl, {
             params: {
-                url: pinterestUrl,
+                url: fullUrl,
                 apikey: 'haqqiarulz'
             },
             headers: {
@@ -56,6 +88,7 @@ async function pinterestDownloader(pinterestUrl) {
     }
 }
 
+// Route Stream Downloader Proxy
 app.get('/api/v1/dl', async (req, res) => {
     const { url, ext = 'mp4' } = req.query;
     if (!url || url.trim() === '') return res.status(400).send('Parameter URL wajib diisi');
@@ -82,9 +115,13 @@ app.get('/api/v1/dl', async (req, res) => {
     }
 });
 
+// Route Utama Proxy API v1
 app.get('/api/v1/download', async (req, res) => {
     const { url } = req.query;
-    const host = `${req.protocol}://${req.get('host')}`;
+    
+    // Deteksi protokol HTTPS Vercel agar tidak terkena Mixed Content Error
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = `${protocol}://${req.get('host')}`;
     
     if (!url) {
         return res.status(400).json({ 
@@ -188,13 +225,20 @@ app.get('/api/v1/download', async (req, res) => {
                 }
             });
         } else {
-            // TikTok Scraper dengan fleksibilitas nama key
+            // TikTok Scraper Handler
             const rawData = await tiktokDownloader(url);
-            const data = rawData.data || rawData.result || rawData;
+            const data = rawData.result || rawData.data || rawData;
+
+            if (!data || (rawData.status === false && !data.play && !data.media)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Gagal mengekstrak video TikTok. Pastikan akun tidak diprivate.'
+                });
+            }
 
             const formattedMedia = [];
 
-            // 1. Cek array media dari API
+            // 1. Ekstraksi dari Array `media`
             if (Array.isArray(data.media) && data.media.length > 0) {
                 data.media.forEach(m => {
                     let label = m.type || 'DOWNLOAD MP4';
@@ -211,7 +255,7 @@ app.get('/api/v1/download', async (req, res) => {
                 });
             }
 
-            // 2. Cek jika TikTok berupa Slide Foto
+            // 2. Ekstraksi Slide Foto TikTok
             const imageList = data.images || data.photo || data.slides;
             if (Array.isArray(imageList) && imageList.length > 0) {
                 imageList.forEach((imgUrl, i) => {
@@ -225,7 +269,7 @@ app.get('/api/v1/download', async (req, res) => {
                 });
             }
 
-            // 3. Cek properti video langsung (play, hdplay, wmplay, video, dll)
+            // 3. Fallback Video langsung (play, hdplay, wmplay, video, dll)
             if (formattedMedia.length === 0) {
                 const hdVideo = data.hdplay || data.nowatermark_hd || data.hd_video;
                 const noWmVideo = data.play || data.nowatermark || data.video || data.url;
@@ -236,7 +280,7 @@ app.get('/api/v1/download', async (req, res) => {
                 if (wmVideo) formattedMedia.push({ type: 'WATERMARK MP4', url: createProxyUrl(wmVideo, 'mp4') });
             }
 
-            // Fallback cover & music
+            // Fallback Cover & Music
             const coverUrl = data.cover || data.origin_cover || data.dynamic_cover || data.thumbnail || (formattedMedia[0] ? formattedMedia[0].url : '');
             const musicUrl = data.music_info?.url || data.music || data.audio || data.play_music || '';
 
@@ -264,8 +308,8 @@ app.get('/api/v1/download', async (req, res) => {
                     download: String(data.stats?.download || 0)
                 },
                 author: {
-                    fullname: data.author?.fullname || data.author?.unique_id || 'user',
-                    nickname: data.author?.nickname || data.author?.nickname || 'TikTok Creator',
+                    fullname: data.author?.unique_id || data.author?.fullname || 'user',
+                    nickname: data.author?.nickname || 'TikTok Creator',
                     avatar: createProxyUrl(data.author?.avatar || data.author?.avatar_thumb, 'jpg')
                 }
             });
