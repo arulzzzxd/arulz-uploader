@@ -18,7 +18,7 @@ function generate20Digits() {
     return result;
 }
 
-// Scraper TikTok API (Tanpa Proxy)
+// Scraper TikTok API (ttdlv2)
 async function tiktokDownloader(tiktokUrl) {
     const apiUrl = 'https://api.arulzzxd.my.id/api/download/ttdlv2';
     try {
@@ -38,7 +38,7 @@ async function tiktokDownloader(tiktokUrl) {
     }
 }
 
-// Scraper Pinterest API (Tanpa Proxy)
+// Scraper Pinterest API (pinterestdl)
 async function pinterestDownloader(pinterestUrl) {
     const apiUrl = 'https://api.arulzzxd.my.id/api/download/pinterestdl';
     try {
@@ -58,7 +58,7 @@ async function pinterestDownloader(pinterestUrl) {
     }
 }
 
-// Route Utama Proxy API v1
+// Route Utama Extractor API v1
 app.get('/api/v1/download', async (req, res) => {
     const { url } = req.query;
     
@@ -89,6 +89,7 @@ app.get('/api/v1/download', async (req, res) => {
 
             const formattedMedia = [];
 
+            // Memproses Video
             if (Array.isArray(content.videos) && content.videos.length > 0) {
                 content.videos.forEach(v => {
                     if (v.url) {
@@ -100,6 +101,7 @@ app.get('/api/v1/download', async (req, res) => {
                 });
             }
 
+            // Memproses Gambar (Prioritas Original -> Resolution)
             if (Array.isArray(content.images) && content.images.length > 0) {
                 const priorityOrder = ['orig', '736x', '564x', '474x', '236x'];
                 const sortedImages = [...content.images].sort((a, b) => {
@@ -158,13 +160,13 @@ app.get('/api/v1/download', async (req, res) => {
                 }
             });
         } else {
-            // TikTok Direct Output
+            // TikTok Scraper Handler (Langsung Tanpa Proxy)
             const rawData = await tiktokDownloader(url);
 
             if (!rawData || (!rawData.success && !rawData.status && !rawData.media)) {
                 return res.status(400).json({
                     success: false,
-                    message: rawData?.message || 'Gagal memproses video TikTok.'
+                    message: rawData?.message || 'Gagal memproses video TikTok. Pastikan akun tidak diprivate.'
                 });
             }
 
