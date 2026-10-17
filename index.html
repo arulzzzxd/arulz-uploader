@@ -551,7 +551,7 @@
             }
         }
 
-        /* DYNAMIC DEEP PARSER FIX */
+        /* DEEP PARSER DINAMIS: Mengekstrak semua opsi kualitas, watermark, dan resolusi */
         function parseApiResponse(json, platform) {
             if (!json) return { success: false, message: 'Respon dari server kosong.' };
             if (json.status === false || json.error) {
@@ -568,66 +568,67 @@
 
             let downloads = [];
 
-            function addLink(label, url) {
+            function addLink(label, url, type = 'mp4') {
                 if (!url || typeof url !== 'string' || !url.startsWith('http')) return;
                 if (!downloads.some(d => d.url === url)) {
-                    downloads.push({ label, url });
+                    downloads.push({ label: label || 'Download', url, type });
                 }
             }
 
             if (typeof core === 'string' && core.startsWith('http')) {
-                addLink('Download Direct', core);
+                addLink('Download Direct', core, 'mp4');
             }
 
             if (typeof core === 'object' && core !== null) {
-                // TikTok & Video Specific Key mappings
-                addLink('Download Video (No WM / HD)', core.hdplay || core.play || core.nowm || core.no_watermark || core.nowatermark);
-                addLink('Download Video (Watermark)', core.wmplay || core.wm || core.watermark);
-                addLink('Download Video', core.video || core.url || core.link || core.download || core.dl_link || core.video1 || core.mp4);
-                addLink('Download Audio (MP3)', core.music || core.audio || core.mp3 || core.music_url);
+                // 1. Opsi TikTok Spesifik
+                addLink('HD No Watermark', core.hdplay || core.hd || core.no_watermark_hd, 'mp4');
+                addLink('No Watermark', core.play || core.nowm || core.no_watermark || core.nowatermark, 'mp4');
+                addLink('Watermark', core.wmplay || core.wm || core.watermark || core.with_watermark, 'mp4');
+                addLink('Audio (MP3)', core.music || core.audio || core.mp3 || core.music_url, 'mp3');
 
                 if (core.video && typeof core.video === 'object') {
-                    addLink('Download Video (HD)', core.video.noWatermark || core.video.hd || core.video.url || core.video.link);
-                    addLink('Download Video (SD)', core.video.watermark || core.video.sd);
+                    addLink('HD No Watermark', core.video.hd || core.video.noWatermark_hd, 'mp4');
+                    addLink('No Watermark', core.video.noWatermark || core.video.url || core.video.link, 'mp4');
+                    addLink('Watermark', core.video.watermark || core.video.sd, 'mp4');
+                } else if (typeof core.video === 'string') {
+                    addLink('Download Video', core.video, 'mp4');
                 }
 
-                const list = core.downloads || core.urls || core.links || core.media || (Array.isArray(core) ? core : null);
+                // 2. Opsi Resolusi Spesifik (1080p, 720p, 480p, 360p, dll)
+                const resKeys = ['1080p', '1080', '720p', '720', '480p', '480', '360p', '360', '240p', '240', '144p', '144', 'hd', 'sd', 'low', 'high', 'quality_1080p', 'quality_720p'];
+                resKeys.forEach(k => {
+                    if (core[k]) {
+                        let label = k.toLowerCase().includes('p') ? `Video ${k}` : (isNaN(k) ? `Video ${k.toUpperCase()}` : `Video ${k}p`);
+                        addLink(label, typeof core[k] === 'string' ? core[k] : (core[k].url || core[k].link), 'mp4');
+                    }
+                });
+
+                // 3. Array Opsi Download (downloads, urls, links, media, formats, qualities)
+                const list = core.downloads || core.urls || core.links || core.media || core.formats || core.qualities || (Array.isArray(core) ? core : null);
                 if (Array.isArray(list)) {
                     list.forEach((item, idx) => {
                         if (typeof item === 'string') {
-                            addLink(`Download Option ${idx + 1}`, item);
+                            addLink(`Download Opsional ${idx + 1}`, item, item.includes('.mp3') ? 'mp3' : 'mp4');
                         } else if (typeof item === 'object' && item !== null) {
-                            addLink(item.quality || item.label || item.title || `Download Option ${idx + 1}`, item.url || item.link || item.download);
+                            let itemLabel = item.quality || item.resolution || item.format || item.label || item.title || (item.height ? `Video ${item.height}p` : `Download Opsional ${idx + 1}`);
+                            let itemType = (item.type || '').includes('audio') || (itemLabel || '').toLowerCase().includes('audio') || (item.url || '').includes('.mp3') ? 'mp3' : 'mp4';
+                            addLink(itemLabel, item.url || item.link || item.download, itemType);
                         }
                     });
                 }
 
-                // Fallback: Deep recursive scan for any HTTP links
+                // 4. Fallback Scanner Recursive
                 if (downloads.length === 0) {
-                    function deepSearchUrls(obj) {
-                        if (!obj) return;
-                        if (typeof obj === 'string' && obj.startsWith('http')) {
-                            if (!obj.match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) {
-                                addLink('Download Media', obj);
+                    for (let key in core) {
+                        if (typeof core[key] === 'string' && core[key].startsWith('http')) {
+                            if (!core[key].match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) {
+                                let formatKey = key.replace(/_/g, ' ').toUpperCase();
+                                let ext = core[key].includes('.mp3') ? 'mp3' : 'mp4';
+                                addLink(`Download (${formatKey})`, core[key], ext);
                             } else if (!thumb) {
-                                thumb = obj;
-                            }
-                        } else if (typeof obj === 'object') {
-                            for (let k in obj) deepSearchUrls(obj[k]);
-                        }
-                    }
-                    deepSearchUrls(core);
-
-                    if (downloads.length === 0) {
-                        function deepSearchAnyUrl(obj) {
-                            if (!obj) return;
-                            if (typeof obj === 'string' && obj.startsWith('http')) {
-                                addLink('Download File', obj);
-                            } else if (typeof obj === 'object') {
-                                for (let k in obj) deepSearchAnyUrl(obj[k]);
+                                thumb = core[key];
                             }
                         }
-                        deepSearchAnyUrl(core);
                     }
                 }
             }
@@ -650,6 +651,60 @@
             };
         }
 
+        /* PENGUNDUH FILE KUSTOM BERBASIS BLOB (arulz-aio-[10 digit angka acak]) */
+        async function downloadFile(url, defaultExt = 'mp4', btnElement) {
+            const randomDigits = Math.floor(1000000000 + Math.random() * 9000000000); // 10 digit acak
+            
+            let ext = defaultExt;
+            if (url.includes('.mp3')) ext = 'mp3';
+            else if (url.includes('.mp4')) ext = 'mp4';
+            else if (url.includes('.jpg') || url.includes('.jpeg')) ext = 'jpg';
+            else if (url.includes('.png')) ext = 'png';
+            else if (url.includes('.tgz')) ext = 'tgz';
+
+            const customFileName = `arulz-aio-${randomDigits}.${ext}`;
+
+            let originalContent = '';
+            if (btnElement) {
+                originalContent = btnElement.innerHTML;
+                btnElement.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Mengunduh...</span>`;
+                btnElement.disabled = true;
+            }
+
+            showToast(`Menyiapkan unduhan: ${customFileName}`, 'info');
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network error');
+                const blob = await response.blob();
+                
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = customFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+
+                showToast(`Berhasil mengunduh: ${customFileName}`, 'success');
+            } catch (err) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.download = customFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast(`Membuka tautan unduhan langsung...`, 'info');
+            } finally {
+                if (btnElement) {
+                    btnElement.innerHTML = originalContent;
+                    btnElement.disabled = false;
+                }
+            }
+        }
+
         function displayResult(res, platform) {
             hideAllCards();
             const card = document.getElementById('result-card');
@@ -661,12 +716,12 @@
             const actionsContainer = document.getElementById('result-download-actions');
             actionsContainer.innerHTML = '';
 
+            // Menampilkan tombol unduhan untuk semua opsi/resolusi yang tersedia
             res.downloads.forEach(dl => {
-                const btn = document.createElement('a');
-                btn.href = dl.url;
-                btn.target = '_blank';
-                btn.rel = 'noopener noreferrer';
-                btn.className = 'px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-lg';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = function() { downloadFile(dl.url, dl.type || 'mp4', this); };
+                btn.className = 'px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-lg active:scale-95';
                 btn.innerHTML = `<i class="fa-solid fa-download"></i> <span>${dl.label}</span>`;
                 actionsContainer.appendChild(btn);
             });
@@ -724,7 +779,7 @@
                         <h4 class="text-xs font-bold text-slate-200 truncate">${item.title}</h4>
                         <span class="text-[10px] text-slate-400">${item.platform} • ${item.time}</span>
                     </div>
-                    <a href="${item.url}" target="_blank" class="p-2 bg-indigo-600 text-white rounded-lg text-xs"><i class="fa-solid fa-download"></i></a>
+                    <button onclick="downloadFile('${item.url}', 'mp4', this)" class="p-2 bg-indigo-600 text-white rounded-lg text-xs"><i class="fa-solid fa-download"></i></button>
                 `;
                 container.appendChild(el);
             });
