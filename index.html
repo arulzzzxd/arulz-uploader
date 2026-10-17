@@ -361,7 +361,7 @@
             }
         }
 
-        // Generator 20 Karakter Acak untuk Format Nama File
+        // Generator 20 Karakter Acak
         function generate20RandomChars() {
             let result = '';
             const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -438,7 +438,7 @@
                     throw new Error('Respon server tidak valid. Silakan coba lagi.');
                 }
 
-                if (response.ok && data.success) {
+                if (response.ok && (data.status || data.success)) {
                     renderResult(data);
                     showToast('Media berhasil diekstraksi!', 'success');
                 } else {
@@ -474,7 +474,6 @@
 
                 showToast('Pengunduhan selesai!', 'success');
             } catch (err) {
-                // Fallback direct open jika dibatasi CORS browser
                 const a = document.createElement('a');
                 a.href = fileUrl;
                 a.download = customFileName;
@@ -485,7 +484,7 @@
             }
         }
 
-        function renderResult(data) {
+        function renderResult(resData) {
             const card = document.getElementById('result-card');
             const authorContainer = document.getElementById('author-container');
             const thumb = document.getElementById('res-thumb');
@@ -494,38 +493,51 @@
             const actions = document.getElementById('res-actions');
             const typeTag = document.getElementById('result-type-tag');
 
-            typeTag.innerText = `${data.platform || 'MEDIA'} DOWNLOAD`;
+            const d = resData.data || resData;
 
-            if (data.author) {
-                authorContainer.innerHTML = `
-                    ${data.author.avatar ? `<img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${data.author.avatar}" alt="Avatar">` : ''}
-                    <div>
-                        <div class="font-extrabold text-sm">${data.author.nickname || ''}</div>
-                        <div class="text-xs font-bold text-slate-500">@${data.author.fullname || ''}</div>
-                    </div>
-                `;
-            }
+            typeTag.innerText = `${resData.platform || 'MEDIA'} DOWNLOAD`;
 
-            thumb.src = data.cover || '';
-            title.innerText = data.title || 'Media Terpilih';
+            const authorName = typeof d.author === 'string' ? d.author : (d.author?.nickname || d.author?.fullname || 'Creator');
+            const authorAvatar = typeof d.author === 'object' ? (d.author?.avatar || '') : '';
 
-            if (data.stats) {
-                stats.innerHTML = `
-                    <span>LIKES: ${data.stats.likes || '0'}</span>
-                    <span>COMMENTS: ${data.stats.comment || '0'}</span>
-                    <span>REGION: ${data.region || 'GLOBAL'}</span>
-                `;
-            }
+            authorContainer.innerHTML = `
+                ${authorAvatar ? `<img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${authorAvatar}" alt="Avatar">` : ''}
+                <div>
+                    <div class="font-extrabold text-sm">${authorName}</div>
+                </div>
+            `;
+
+            thumb.src = d.cover || 'https://via.placeholder.com/400x400?text=Media+Preview';
+            title.innerText = d.caption || d.title || 'Media Terpilih';
+
+            stats.innerHTML = `
+                <span>PLATFORM: ${resData.platform || 'ONLINE'}</span>
+                <span>STATUS: READY</span>
+            `;
 
             actions.innerHTML = '';
 
-            if (Array.isArray(data.media) && data.media.length > 0) {
+            // Tombol Video Tanpa Watermark (TikTok)
+            if (d.video_tanpa_watermark) {
+                actions.innerHTML += `
+                    <button onclick="downloadDirectFile('${d.video_tanpa_watermark}', 'mp4')" class="neo-btn p-3.5 bg-neoYellow text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span>DOWNLOAD NO WATERMARK MP4</span>
+                    </button>
+                `;
+            }
+
+            // Tombol Media Array (Pinterest)
+            if (Array.isArray(d.media) && d.media.length > 0) {
                 const colors = ['bg-neoYellow', 'bg-neoCyan', 'bg-neoGreen', 'bg-neoPink'];
 
-                data.media.forEach((item, index) => {
+                d.media.forEach((item, index) => {
                     const bg = colors[index % colors.length];
                     let label = item.type || `DOWNLOAD MEDIA ${index + 1}`;
-
                     const ext = item.url.includes('.png') ? 'png' : (item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.webp') ? 'jpg' : 'mp4');
 
                     actions.innerHTML += `
@@ -541,9 +553,11 @@
                 });
             }
 
-            if (data.music_info && data.music_info.url) {
+            // Tombol Audio MP3
+            const audioUrl = d.audio_mp3 || d.music_info?.url;
+            if (audioUrl) {
                 actions.innerHTML += `
-                    <button onclick="downloadDirectFile('${data.music_info.url}', 'mp3')" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
+                    <button onclick="downloadDirectFile('${audioUrl}', 'mp3')" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 18V5l12-2v13"/>
                             <circle cx="6" cy="18" r="3"/>
