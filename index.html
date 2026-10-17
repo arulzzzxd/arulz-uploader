@@ -420,26 +420,30 @@
         }
 
         function handleInput(url) {
-            const clearBtn = document.getElementById('clear-btn');
-            const badge = document.getElementById('detector-badge');
-            const nameEl = document.getElementById('detector-name');
+    const clearBtn = document.getElementById('clear-btn');
+    const badge = document.getElementById('detector-badge');
+    const nameEl = document.getElementById('detector-name');
 
-            if (url.trim() !== '') {
-                clearBtn.classList.remove('hidden');
-                clearBtn.classList.add('flex');
+    if (url.trim() !== '') {
+        clearBtn.classList.remove('hidden');
+        clearBtn.classList.add('flex');
 
-                if (/tiktok\.com/i.test(url)) {
-                    badge.classList.remove('hidden');
-                    badge.classList.add('flex');
-                    nameEl.innerText = 'TIKTOK';
-                } else {
-                    badge.classList.add('hidden');
-                }
-            } else {
-                clearBtn.classList.add('hidden');
-                badge.classList.add('hidden');
-            }
+        if (/tiktok\.com/i.test(url)) {
+            badge.classList.remove('hidden');
+            badge.classList.add('flex');
+            nameEl.innerText = 'TIKTOK';
+        } else if (/pinterest\.com|pin\.it/i.test(url)) {
+            badge.classList.remove('hidden');
+            badge.classList.add('flex');
+            nameEl.innerText = 'PINTEREST';
+        } else {
+            badge.classList.add('hidden');
         }
+    } else {
+        clearBtn.classList.add('hidden');
+        badge.classList.add('hidden');
+    }
+}
 
         function clearInput() {
             const input = document.getElementById('media-url');
@@ -463,98 +467,106 @@
         }
 
         async function processMedia() {
-            const input = document.getElementById('media-url').value.trim();
-            if (!input) {
-                showToast('Silakan tempel tautan media terlebih dahulu!', 'error');
-                return;
-            }
+    const input = document.getElementById('media-url').value.trim();
+    if (!input) {
+        showToast('Silakan tempel tautan media terlebih dahulu!', 'error');
+        return;
+    }
 
-            setLoadingState(true);
+    setLoadingState(true);
 
-            try {
-                const response = await fetch(`/api/v1/download?url=${encodeURIComponent(input)}`);
-                const data = await response.json();
+    try {
+        const response = await fetch(`/api/v1/download?url=${encodeURIComponent(input)}`);
+        const data = await response.json();
 
-                if (data.success || data.result) {
-                    const result = data.data || data;
-                    renderResult(result);
-                    showToast('Media berhasil diekstraksi!', 'success');
-                } else {
-                    showToast('Gagal memproses media. Pastikan URL valid.', 'error');
-                }
-            } catch (err) {
-                console.error(err);
-                showToast('Terjadi kesalahan koneksi server.', 'error');
-            } finally {
-                setLoadingState(false);
-            }
+        if (response.ok && data.success) {
+            renderResult(data);
+            showToast('Media berhasil diekstraksi!', 'success');
+        } else {
+            showToast(data.message || 'Gagal memproses media. Pastikan URL valid.', 'error');
         }
+    } catch (err) {
+        console.error(err);
+        showToast('Gagal terhubung ke server backend.', 'error');
+    } finally {
+        setLoadingState(false);
+    }
+}
 
         function renderResult(data) {
-            const card = document.getElementById('result-card');
-            const authorContainer = document.getElementById('author-container');
-            const thumb = document.getElementById('res-thumb');
-            const title = document.getElementById('res-title');
-            const stats = document.getElementById('res-stats');
-            const actions = document.getElementById('res-actions');
+    const card = document.getElementById('result-card');
+    const authorContainer = document.getElementById('author-container');
+    const thumb = document.getElementById('res-thumb');
+    const title = document.getElementById('res-title');
+    const stats = document.getElementById('res-stats');
+    const actions = document.getElementById('res-actions');
+    const typeTag = document.getElementById('result-type-tag');
 
-            if (data.author) {
-                authorContainer.innerHTML = `
-                    <img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${data.author.avatar}" alt="${data.author.nickname}">
-                    <div>
-                        <div class="font-extrabold text-sm">${data.author.nickname || ''}</div>
-                        <div class="text-xs font-bold text-slate-500">@${data.author.fullname || ''}</div>
-                    </div>
-                `;
-            }
+    // Ubah label tag platform
+    typeTag.innerText = `${data.platform || 'MEDIA'} DOWNLOAD`;
 
-            thumb.src = data.cover || '';
-            title.innerText = data.title || 'Video TikTok Terpilih';
+    // Render Author
+    if (data.author) {
+        authorContainer.innerHTML = `
+            ${data.author.avatar ? `<img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${data.author.avatar}" alt="Avatar">` : ''}
+            <div>
+                <div class="font-extrabold text-sm">${data.author.nickname || ''}</div>
+                <div class="text-xs font-bold text-slate-500">@${data.author.fullname || ''}</div>
+            </div>
+        `;
+    }
 
-            if (data.stats) {
-                stats.innerHTML = `
-                    <span>VIEWS: ${data.stats.views || '0'}</span>
-                    <span>LIKES: ${data.stats.likes || '0'}</span>
-                    <span>DURATION: ${data.duration || '-'}</span>
-                `;
-            }
+    thumb.src = data.cover || '';
+    title.innerText = data.title || 'Media Terpilih';
 
-            actions.innerHTML = '';
+    if (data.stats) {
+        stats.innerHTML = `
+            <span>LIKES: ${data.stats.likes || '0'}</span>
+            <span>COMMENTS: ${data.stats.comment || '0'}</span>
+            <span>REGION: ${data.region || 'GLOBAL'}</span>
+        `;
+    }
 
-            if (Array.isArray(data.media)) {
-                data.media.forEach(item => {
-                    let label = 'DOWNLOAD MP4';
-                    let bg = 'bg-neoYellow';
-                    if (item.type === '') {
-                        label = 'WATERMARK MP4';
-                        bg = 'bg-neoCyan';
-                    } else if (item.type === 'nowatermark') {
-                        label = 'NOWATERMARK MP4';
-                        bg = 'bg-neoYellow';
-                    } else if (item.type === 'nowatermark_hd') {
-                        label = 'NOWATERMARK HD MP4';
-                        bg = 'bg-neoGreen';
-                    }
+    actions.innerHTML = '';
 
-                    actions.innerHTML += `
-                        <a href="${item.url}" download class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase">
-                            <span>${label}</span>
-                        </a>
-                    `;
-                });
-            }
+    // Render Tombol Download Otomatis Berdasarkan Media
+    if (Array.isArray(data.media) && data.media.length > 0) {
+        const colors = ['bg-neoYellow', 'bg-neoCyan', 'bg-neoGreen', 'bg-neoPink'];
 
-            if (data.music_info && data.music_info.url) {
-                actions.innerHTML += `
-                    <a href="${data.music_info.url}" download class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase">
-                        <span>DOWNLOAD MP3 AUDIO</span>
-                    </a>
-                `;
-            }
+        data.media.forEach((item, index) => {
+            const bg = colors[index % colors.length];
+            let label = item.type || `DOWNLOAD MEDIA ${index + 1}`;
 
-            card.classList.remove('hidden');
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+            actions.innerHTML += `
+                <a href="${item.url}" download target="_blank" class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span>${label}</span>
+                </a>
+            `;
+        });
+    }
+
+    // Render Audio jika ada (misal TikTok)
+    if (data.music_info && data.music_info.url) {
+        actions.innerHTML += `
+            <a href="${data.music_info.url}" download target="_blank" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+                <span>DOWNLOAD AUDIO MP3</span>
+            </a>
+        `;
+    }
+
+    card.classList.remove('hidden');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
         function setLoadingState(isLoading) {
             const btn = document.getElementById('process-btn');

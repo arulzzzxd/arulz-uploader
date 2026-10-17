@@ -14,8 +14,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/v1/download/:path*",
-      "destination": "https://api.arulzzxd.my.id/api/download/:path*?apikey=haqqiarulz"
+      "source": "/(.*)",
+      "destination": "/server.js"
     }
   ]
 }
