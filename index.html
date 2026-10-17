@@ -135,7 +135,7 @@
                 <span class="animated-gradient-text">Cepat, Gratis & Tanpa Watermark</span>
             </h2>
             <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto font-normal">
-                Tempel link dari YouTube, TikTok, Instagram, Spotify, Twitter, Pinterest, atau NPM untuk mendapatkan tautan unduhan langsung.
+                Tempel link dari YouTube, TikTok, Instagram, Spotify, Twitter, Pinterest, atau NPM. Opsi format & resolusi akan otomatis muncul.
             </p>
 
             <!-- URL SEARCH BAR -->
@@ -172,53 +172,6 @@
                         <span>Download</span>
                     </button>
                 </div>
-
-                <!-- YouTube Quality & Dynamic Endpoint Selection Bar -->
-                <div id="options-bar" class="mt-3 flex flex-wrap items-center justify-between gap-3 px-2 text-xs text-slate-400">
-                    <div class="flex items-center gap-2">
-                        <span class="font-medium text-slate-400">Pilih Platform:</span>
-                        <select id="endpoint-select" onchange="manualEndpointChange()" class="bg-slate-800/90 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
-                            <option value="auto">✨ Deteksi Otomatis</option>
-                            <optgroup label="Sosial & Video">
-                                <option value="ytmp4">YouTube Video (MP4)</option>
-                                <option value="ytmp3">YouTube Audio (MP3)</option>
-                                <option value="ttdl">TikTok Video (v1)</option>
-                                <option value="ttdlv2">TikTok Video (v2)</option>
-                                <option value="igdl">Instagram Post/Reel</option>
-                                <option value="fbdl">Facebook Video</option>
-                                <option value="xdl">Twitter / X Media</option>
-                                <option value="pinteresviddl">Pinterest Video</option>
-                                <option value="pinterestdl">Pinterest Image</option>
-                                <option value="threads">Threads Post</option>
-                                <option value="douyindl">Douyin Media</option>
-                                <option value="capcut">CapCut Template</option>
-                                <option value="videy">Videy Clip</option>
-                            </optgroup>
-                            <optgroup label="Audio & Musik">
-                                <option value="spotifydl">Spotify Track</option>
-                            </optgroup>
-                            <optgroup label="Developer Tools">
-                                <option value="npmdl">NPM Package Tarball</option>
-                            </optgroup>
-                            <optgroup label="Konten Dewasa 18+" id="nsfw-optgroup" class="hidden">
-                                <option value="xvideosdl">XVideos</option>
-                                <option value="xnxxdl">XNXX</option>
-                                <option value="xhamsterdl">XHamster</option>
-                                <option value="pornhubdl">Pornhub</option>
-                            </optgroup>
-                        </select>
-                    </div>
-
-                    <div id="yt-quality-container" class="flex items-center gap-2">
-                        <span class="font-medium text-slate-400">Kualitas Video:</span>
-                        <select id="yt-quality" class="bg-slate-800/90 text-indigo-300 border border-indigo-500/40 font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none">
-                            <option value="1080">1080p (Full HD)</option>
-                            <option value="720" selected>720p (HD)</option>
-                            <option value="480">480p (SD)</option>
-                            <option value="360">360p (Rendah)</option>
-                        </select>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -247,7 +200,7 @@
             </div>
             <div class="flex items-center justify-center gap-2 text-indigo-400 text-sm font-medium pt-2">
                 <i class="fa-solid fa-spinner fa-spin text-base"></i>
-                <span>Mengambil data media dari server API...</span>
+                <span>Mengambil data resolusi & link media...</span>
             </div>
         </section>
 
@@ -292,8 +245,12 @@
                             </div>
                         </div>
 
-                        <div id="result-download-actions" class="flex flex-wrap gap-2.5 pt-2">
-                            <!-- Injected dynamically -->
+                        <!-- Pilihan Resolusi, MP3 / MP4 Ditampilkan Di Sini -->
+                        <div class="space-y-2">
+                            <span class="text-xs font-semibold text-slate-400 block">Pilih Opsi Unduhan:</span>
+                            <div id="result-download-actions" class="flex flex-wrap gap-2 pt-1">
+                                <!-- Injected dynamically -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -396,10 +353,8 @@
         const API_KEY = 'haqqiarulz'; // Internal API Key
 
         const PLATFORMS = [
-            { id: 'ytmp4', name: 'YouTube MP4', cat: 'social', icon: 'fa-youtube', color: 'text-red-500', bg: 'bg-red-500/10', pattern: /(youtube\.com\/watch|youtu\.be\/)/i },
-            { id: 'ytmp3', name: 'YouTube MP3', cat: 'music', icon: 'fa-music', color: 'text-red-400', bg: 'bg-red-500/10', pattern: /(youtube\.com|youtu\.be).*audio/i },
-            { id: 'ttdl', name: 'TikTok (v1)', cat: 'social', icon: 'fa-tiktok', color: 'text-cyan-400', bg: 'bg-cyan-500/10', pattern: /(tiktok\.com|vt\.tiktok\.com)/i },
-            { id: 'ttdlv2', name: 'TikTok (v2)', cat: 'social', icon: 'fa-tiktok', color: 'text-pink-400', bg: 'bg-pink-500/10', pattern: null },
+            { id: 'ytmp4', name: 'YouTube', cat: 'social', icon: 'fa-youtube', color: 'text-red-500', bg: 'bg-red-500/10', pattern: /(youtube\.com|youtu\.be)/i },
+            { id: 'ttdl', name: 'TikTok', cat: 'social', icon: 'fa-tiktok', color: 'text-cyan-400', bg: 'bg-cyan-500/10', pattern: /(tiktok\.com|vt\.tiktok\.com)/i },
             { id: 'igdl', name: 'Instagram', cat: 'social', icon: 'fa-instagram', color: 'text-pink-500', bg: 'bg-pink-500/10', pattern: /(instagram\.com|instagr\.am)/i },
             { id: 'fbdl', name: 'Facebook', cat: 'social', icon: 'fa-facebook', color: 'text-blue-500', bg: 'bg-blue-500/10', pattern: /(facebook\.com|fb\.watch|fb\.com)/i },
             { id: 'spotifydl', name: 'Spotify', cat: 'music', icon: 'fa-spotify', color: 'text-emerald-500', bg: 'bg-emerald-500/10', pattern: /(spotify\.com|open\.spotify\.com)/i },
@@ -462,14 +417,12 @@
             if (!input) {
                 state.currentPlatform = 'auto';
                 badge.classList.add('hidden');
-                document.getElementById('endpoint-select').value = 'auto';
                 return;
             }
 
             let matched = PLATFORMS.find(p => p.pattern && p.pattern.test(input) && (!p.adult || state.nsfwEnabled));
             if (matched) {
                 state.currentPlatform = matched.id;
-                document.getElementById('endpoint-select').value = matched.id;
                 badge.classList.remove('hidden');
                 icon.className = `fa-solid ${matched.icon} ${matched.color}`;
                 name.textContent = matched.name;
@@ -479,12 +432,6 @@
                 icon.className = 'fa-solid fa-link text-indigo-400';
                 name.textContent = 'Auto Deteksi';
             }
-        }
-
-        function manualEndpointChange() {
-            const selected = document.getElementById('endpoint-select').value;
-            state.currentPlatform = selected;
-            if (selected === 'auto') handleUrlInput();
         }
 
         function clearInput() {
@@ -517,31 +464,78 @@
 
             const platformConfig = PLATFORMS.find(p => p.id === targetPlatformId) || PLATFORMS[0];
 
-            let apiUrl = `${API_BASE}/${targetPlatformId}?apikey=${API_KEY}`;
-            if (targetPlatformId === 'npmdl') {
-                let pkgName = inputVal.includes('npmjs.com/package/') ? inputVal.split('npmjs.com/package/')[1].split('/')[0] : inputVal;
-                apiUrl += `&package=${encodeURIComponent(pkgName)}`;
-            } else {
-                apiUrl += `&url=${encodeURIComponent(inputVal)}`;
-            }
-
-            if (targetPlatformId === 'ytmp4') {
-                apiUrl += `&quality=${document.getElementById('yt-quality').value}`;
-            }
-
             hideAllCards();
             document.getElementById('loading-state').classList.remove('hidden');
 
             try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                const parsed = parseApiResponse(data, platformConfig);
+                let parsedResult = { success: false, title: '', author: '', thumb: '', downloads: [] };
 
-                if (parsed.success) {
-                    displayResult(parsed, platformConfig);
-                    saveToHistory(parsed, platformConfig, inputVal);
+                // KHUSUS YOUTUBE: Ambil data Video (ytmp4) dan Audio (ytmp3) secara bersamaan
+                if (targetPlatformId === 'ytmp4' || targetPlatformId === 'ytmp3' || /youtube\.com|youtu\.be/i.test(inputVal)) {
+                    const [mp4Res, mp3Res] = await Promise.allSettled([
+                        fetch(`${API_BASE}/ytmp4?apikey=${API_KEY}&url=${encodeURIComponent(inputVal)}`).then(r => r.json()),
+                        fetch(`${API_BASE}/ytmp3?apikey=${API_KEY}&url=${encodeURIComponent(inputVal)}`).then(r => r.json())
+                    ]);
+
+                    let downloads = [];
+                    let title = '', author = '', thumb = '';
+
+                    if (mp4Res.status === 'fulfilled' && mp4Res.value) {
+                        const p4 = parseApiResponse(mp4Res.value, platformConfig);
+                        if (p4.success) {
+                            title = p4.title;
+                            author = p4.author;
+                            thumb = p4.thumb;
+                            downloads.push(...p4.downloads);
+                        }
+                    }
+
+                    if (mp3Res.status === 'fulfilled' && mp3Res.value) {
+                        const p3 = parseApiResponse(mp3Res.value, platformConfig);
+                        if (p3.success) {
+                            if (!title) title = p3.title;
+                            if (!author) author = p3.author;
+                            if (!thumb) thumb = p3.thumb;
+
+                            p3.downloads.forEach(d => {
+                                if (!downloads.some(exist => exist.url === d.url)) {
+                                    downloads.push({ label: '🎵 Audio (MP3)', url: d.url, type: 'mp3' });
+                                }
+                            });
+                        }
+                    }
+
+                    if (downloads.length > 0) {
+                        parsedResult = {
+                            success: true,
+                            title: title || 'YouTube Video',
+                            author: author || 'YouTube Creator',
+                            thumb: thumb || '',
+                            downloads: downloads
+                        };
+                    } else {
+                        throw new Error('Gagal mengambil data dari YouTube.');
+                    }
                 } else {
-                    throw new Error(parsed.message || 'Gagal mengekstrak tautan media.');
+                    // UNTUK PLATFORM LAIN (TikTok, IG, dll)
+                    let apiUrl = `${API_BASE}/${targetPlatformId}?apikey=${API_KEY}`;
+                    if (targetPlatformId === 'npmdl') {
+                        let pkgName = inputVal.includes('npmjs.com/package/') ? inputVal.split('npmjs.com/package/')[1].split('/')[0] : inputVal;
+                        apiUrl += `&package=${encodeURIComponent(pkgName)}`;
+                    } else {
+                        apiUrl += `&url=${encodeURIComponent(inputVal)}`;
+                    }
+
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+                    parsedResult = parseApiResponse(data, platformConfig);
+                }
+
+                if (parsedResult.success) {
+                    displayResult(parsedResult, platformConfig);
+                    saveToHistory(parsedResult, platformConfig, inputVal);
+                } else {
+                    throw new Error(parsedResult.message || 'Gagal mengekstrak tautan media.');
                 }
             } catch (err) {
                 document.getElementById('loading-state').classList.add('hidden');
@@ -551,7 +545,7 @@
             }
         }
 
-        /* DEEP PARSER DINAMIS: Mengekstrak semua opsi kualitas, watermark, dan resolusi */
+        /* DEEP PARSER DINAMIS: Mengekstrak semua opsi resolusi, watermark, dan MP3 */
         function parseApiResponse(json, platform) {
             if (!json) return { success: false, message: 'Respon dari server kosong.' };
             if (json.status === false || json.error) {
@@ -576,55 +570,57 @@
             }
 
             if (typeof core === 'string' && core.startsWith('http')) {
-                addLink('Download Direct', core, 'mp4');
+                addLink('🎬 Download Direct', core, 'mp4');
             }
 
             if (typeof core === 'object' && core !== null) {
-                // 1. Opsi TikTok Spesifik
-                addLink('HD No Watermark', core.hdplay || core.hd || core.no_watermark_hd, 'mp4');
-                addLink('No Watermark', core.play || core.nowm || core.no_watermark || core.nowatermark, 'mp4');
-                addLink('Watermark', core.wmplay || core.wm || core.watermark || core.with_watermark, 'mp4');
-                addLink('Audio (MP3)', core.music || core.audio || core.mp3 || core.music_url, 'mp3');
+                // TikTok
+                addLink('🎬 HD No Watermark', core.hdplay || core.hd || core.no_watermark_hd, 'mp4');
+                addLink('🎬 No Watermark', core.play || core.nowm || core.no_watermark || core.nowatermark, 'mp4');
+                addLink('🎬 Watermark', core.wmplay || core.wm || core.watermark || core.with_watermark, 'mp4');
+                addLink('🎵 Audio (MP3)', core.music || core.audio || core.mp3 || core.music_url, 'mp3');
 
                 if (core.video && typeof core.video === 'object') {
-                    addLink('HD No Watermark', core.video.hd || core.video.noWatermark_hd, 'mp4');
-                    addLink('No Watermark', core.video.noWatermark || core.video.url || core.video.link, 'mp4');
-                    addLink('Watermark', core.video.watermark || core.video.sd, 'mp4');
+                    addLink('🎬 HD No Watermark', core.video.hd || core.video.noWatermark_hd, 'mp4');
+                    addLink('🎬 No Watermark', core.video.noWatermark || core.video.url || core.video.link, 'mp4');
+                    addLink('🎬 Watermark', core.video.watermark || core.video.sd, 'mp4');
                 } else if (typeof core.video === 'string') {
-                    addLink('Download Video', core.video, 'mp4');
+                    addLink('🎬 Download Video', core.video, 'mp4');
                 }
 
-                // 2. Opsi Resolusi Spesifik (1080p, 720p, 480p, 360p, dll)
+                // Opsi Resolusi Kualitas
                 const resKeys = ['1080p', '1080', '720p', '720', '480p', '480', '360p', '360', '240p', '240', '144p', '144', 'hd', 'sd', 'low', 'high', 'quality_1080p', 'quality_720p'];
                 resKeys.forEach(k => {
                     if (core[k]) {
-                        let label = k.toLowerCase().includes('p') ? `Video ${k}` : (isNaN(k) ? `Video ${k.toUpperCase()}` : `Video ${k}p`);
+                        let label = k.toLowerCase().includes('p') ? `🎬 Video ${k}` : (isNaN(k) ? `🎬 Video ${k.toUpperCase()}` : `🎬 Video ${k}p`);
                         addLink(label, typeof core[k] === 'string' ? core[k] : (core[k].url || core[k].link), 'mp4');
                     }
                 });
 
-                // 3. Array Opsi Download (downloads, urls, links, media, formats, qualities)
+                // Array opsi bawaan dari API
                 const list = core.downloads || core.urls || core.links || core.media || core.formats || core.qualities || (Array.isArray(core) ? core : null);
                 if (Array.isArray(list)) {
                     list.forEach((item, idx) => {
                         if (typeof item === 'string') {
-                            addLink(`Download Opsional ${idx + 1}`, item, item.includes('.mp3') ? 'mp3' : 'mp4');
+                            const isMp3 = item.includes('.mp3');
+                            addLink(isMp3 ? `🎵 Audio MP3 ${idx + 1}` : `🎬 Video Option ${idx + 1}`, item, isMp3 ? 'mp3' : 'mp4');
                         } else if (typeof item === 'object' && item !== null) {
-                            let itemLabel = item.quality || item.resolution || item.format || item.label || item.title || (item.height ? `Video ${item.height}p` : `Download Opsional ${idx + 1}`);
+                            let itemLabel = item.quality || item.resolution || item.format || item.label || item.title || (item.height ? `Video ${item.height}p` : `Option ${idx + 1}`);
                             let itemType = (item.type || '').includes('audio') || (itemLabel || '').toLowerCase().includes('audio') || (item.url || '').includes('.mp3') ? 'mp3' : 'mp4';
-                            addLink(itemLabel, item.url || item.link || item.download, itemType);
+                            let prefix = itemType === 'mp3' ? '🎵 ' : '🎬 ';
+                            addLink(`${prefix}${itemLabel}`, item.url || item.link || item.download, itemType);
                         }
                     });
                 }
 
-                // 4. Fallback Scanner Recursive
+                // Fallback Scanner
                 if (downloads.length === 0) {
                     for (let key in core) {
                         if (typeof core[key] === 'string' && core[key].startsWith('http')) {
                             if (!core[key].match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) {
                                 let formatKey = key.replace(/_/g, ' ').toUpperCase();
-                                let ext = core[key].includes('.mp3') ? 'mp3' : 'mp4';
-                                addLink(`Download (${formatKey})`, core[key], ext);
+                                let isMp3 = core[key].includes('.mp3');
+                                addLink(`${isMp3 ? '🎵' : '🎬'} Download (${formatKey})`, core[key], isMp3 ? 'mp3' : 'mp4');
                             } else if (!thumb) {
                                 thumb = core[key];
                             }
@@ -651,16 +647,15 @@
             };
         }
 
-        /* PENGUNDUH FILE KUSTOM BERBASIS BLOB (arulz-aio-[10 digit angka acak]) */
+        /* METODE DOWNLOAD BLOB UNTUK NAMA FILE KUSTOM (arulz-aio-[10 digit angka acak]) */
         async function downloadFile(url, defaultExt = 'mp4', btnElement) {
-            const randomDigits = Math.floor(1000000000 + Math.random() * 9000000000); // 10 digit acak
+            const randomDigits = Math.floor(1000000000 + Math.random() * 9000000000);
             
             let ext = defaultExt;
             if (url.includes('.mp3')) ext = 'mp3';
             else if (url.includes('.mp4')) ext = 'mp4';
             else if (url.includes('.jpg') || url.includes('.jpeg')) ext = 'jpg';
             else if (url.includes('.png')) ext = 'png';
-            else if (url.includes('.tgz')) ext = 'tgz';
 
             const customFileName = `arulz-aio-${randomDigits}.${ext}`;
 
@@ -716,7 +711,7 @@
             const actionsContainer = document.getElementById('result-download-actions');
             actionsContainer.innerHTML = '';
 
-            // Menampilkan tombol unduhan untuk semua opsi/resolusi yang tersedia
+            // Menampilkan semua tombol pilihan resolusi/format sekaligus
             res.downloads.forEach(dl => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
@@ -795,7 +790,7 @@
             grid.innerHTML = '';
             PLATFORMS.filter(p => !p.adult || state.nsfwEnabled).forEach(p => {
                 const card = document.createElement('div');
-                card.onclick = () => { state.currentPlatform = p.id; document.getElementById('endpoint-select').value = p.id; document.getElementById('url-input').focus(); };
+                card.onclick = () => { state.currentPlatform = p.id; document.getElementById('url-input').focus(); };
                 card.className = 'glass p-3 rounded-2xl border border-slate-800 hover:border-indigo-500 cursor-pointer flex items-center gap-3';
                 card.innerHTML = `<i class="fa-solid ${p.icon} ${p.color} text-lg"></i><span class="text-xs font-bold text-slate-200">${p.name}</span>`;
                 grid.appendChild(card);
