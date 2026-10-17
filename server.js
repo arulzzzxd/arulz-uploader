@@ -18,7 +18,7 @@ function generate20Digits() {
     return result;
 }
 
-// Scraper TikTok API (Hanya Endpoint ArulzXD ttdlv2)
+// Scraper TikTok API (Tanpa Proxy)
 async function tiktokDownloader(tiktokUrl) {
     const apiUrl = 'https://api.arulzzxd.my.id/api/download/ttdlv2';
     try {
@@ -38,7 +38,7 @@ async function tiktokDownloader(tiktokUrl) {
     }
 }
 
-// Scraper Pinterest API
+// Scraper Pinterest API (Tanpa Proxy)
 async function pinterestDownloader(pinterestUrl) {
     const apiUrl = 'https://api.arulzzxd.my.id/api/download/pinterestdl';
     try {
@@ -58,41 +58,9 @@ async function pinterestDownloader(pinterestUrl) {
     }
 }
 
-// Route Stream Downloader Proxy
-app.get('/api/v1/dl', async (req, res) => {
-    const { url, ext = 'mp4' } = req.query;
-    if (!url || url.trim() === '') return res.status(400).send('Parameter URL wajib diisi');
-
-    try {
-        const decodedUrl = decodeURIComponent(url);
-        const fileName = `ArulXd-${generate20Digits()}.${ext}`;
-
-        const response = await axios({
-            method: 'get',
-            url: decodedUrl,
-            responseType: 'stream',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Referer': 'https://www.tiktok.com/'
-            },
-            timeout: 20000
-        });
-
-        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-        res.setHeader('Content-Type', response.headers['content-type'] || 'application/octet-stream');
-        response.data.pipe(res);
-    } catch (err) {
-        console.error('Proxy Stream Error:', err.message);
-        res.status(500).send('Gagal mengunduh berkas media');
-    }
-});
-
 // Route Utama Proxy API v1
 app.get('/api/v1/download', async (req, res) => {
     const { url } = req.query;
-    
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = `${protocol}://${req.get('host')}`;
     
     if (!url) {
         return res.status(400).json({ 
@@ -102,11 +70,6 @@ app.get('/api/v1/download', async (req, res) => {
     }
 
     try {
-        const createProxyUrl = (targetUrl, ext) => {
-            if (!targetUrl || typeof targetUrl !== 'string' || !targetUrl.startsWith('http')) return '';
-            return `${host}/api/v1/dl?url=${encodeURIComponent(targetUrl)}&ext=${ext}`;
-        };
-
         const isPinterest = /pinterest\.com|pin\.it/i.test(url);
 
         if (isPinterest) {
@@ -131,7 +94,7 @@ app.get('/api/v1/download', async (req, res) => {
                     if (v.url) {
                         formattedMedia.push({
                             type: v.quality ? `VIDEO (${v.quality.toUpperCase()})` : 'DOWNLOAD VIDEO MP4',
-                            url: createProxyUrl(v.url, 'mp4')
+                            url: v.url
                         });
                     }
                 });
@@ -155,10 +118,9 @@ app.get('/api/v1/download', async (req, res) => {
                         let label = `GAMBAR (${img.quality ? img.quality.toUpperCase() : 'HD'})`;
                         if (img.quality === 'orig') label = 'GAMBAR ORIGINAL (HD MAX)';
 
-                        const ext = img.url.includes('.png') ? 'png' : 'jpg';
                         formattedMedia.push({
                             type: label,
-                            url: createProxyUrl(img.url, ext)
+                            url: img.url
                         });
                     }
                 });
@@ -180,7 +142,7 @@ app.get('/api/v1/download', async (req, res) => {
                 region: 'US',
                 id: generate20Digits(),
                 duration: '-',
-                cover: createProxyUrl(coverUrl, 'jpg'),
+                cover: coverUrl,
                 media: formattedMedia,
                 stats: {
                     views: '-',
@@ -192,23 +154,22 @@ app.get('/api/v1/download', async (req, res) => {
                 author: {
                     fullname: user.username || 'pinterest_user',
                     nickname: user.fullName || 'Pinterest Creator',
-                    avatar: createProxyUrl(coverUrl, 'jpg')
+                    avatar: coverUrl
                 }
             });
         } else {
-            // TikTok Processing (Sesuai Struktur JSON ttdlv2)
+            // TikTok Direct Output
             const rawData = await tiktokDownloader(url);
 
             if (!rawData || (!rawData.success && !rawData.status && !rawData.media)) {
                 return res.status(400).json({
                     success: false,
-                    message: rawData?.message || 'Gagal memproses video TikTok. Pastikan link publik.'
+                    message: rawData?.message || 'Gagal memproses video TikTok.'
                 });
             }
 
             const formattedMedia = [];
 
-            // Membaca array `media` dari ttdlv2
             if (Array.isArray(rawData.media)) {
                 rawData.media.forEach(m => {
                     let label = 'DOWNLOAD MP4';
@@ -219,7 +180,7 @@ app.get('/api/v1/download', async (req, res) => {
                     if (m.url) {
                         formattedMedia.push({
                             type: label,
-                            url: createProxyUrl(m.url, 'mp4')
+                            url: m.url
                         });
                     }
                 });
@@ -233,13 +194,13 @@ app.get('/api/v1/download', async (req, res) => {
                 region: rawData.region || 'ID',
                 id: rawData.id || generate20Digits(),
                 duration: rawData.duration || '-',
-                cover: createProxyUrl(rawData.cover, 'webp'),
+                cover: rawData.cover || '',
                 media: formattedMedia,
                 music_info: (rawData.music_info && rawData.music_info.url) ? {
                     id: rawData.music_info.id || generate20Digits(),
                     title: rawData.music_info.title || 'Original Sound',
                     author: rawData.music_info.author || 'Unknown',
-                    url: createProxyUrl(rawData.music_info.url, 'mp3')
+                    url: rawData.music_info.url
                 } : null,
                 stats: {
                     views: String(rawData.stats?.views || '0'),
@@ -251,14 +212,14 @@ app.get('/api/v1/download', async (req, res) => {
                 author: {
                     fullname: rawData.author?.fullname || 'user',
                     nickname: rawData.author?.nickname || 'TikTok Creator',
-                    avatar: createProxyUrl(rawData.author?.avatar, 'jpeg')
+                    avatar: rawData.author?.avatar || ''
                 }
             });
         }
     } catch (error) {
         return res.status(500).json({ 
             success: false, 
-            message: error.message || 'Gagal memproses media. Pastikan tautan valid.',
+            message: error.message || 'Gagal memproses media.',
         });
     }
 });
