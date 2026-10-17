@@ -361,6 +361,16 @@
             }
         }
 
+        // Generator 20 Karakter Acak untuk Format Nama File
+        function generate20RandomChars() {
+            let result = '';
+            const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+            for (let i = 0; i < 20; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
         function handleInput(url) {
             const clearBtn = document.getElementById('clear-btn');
             const badge = document.getElementById('detector-badge');
@@ -442,9 +452,11 @@
             }
         }
 
-        // Pengunduh Otomatis Tanpa Proxy dengan Nama Kustom
-        async function downloadDirectFile(fileUrl, customFileName) {
+        // Pengunduh Langsung dengan Format Nama: arulzxd[20_random_karakter].[ext]
+        async function downloadDirectFile(fileUrl, ext) {
             showToast('Memulai pengunduhan berkas...', 'info');
+            const customFileName = `arulzxd${generate20RandomChars()}.${ext}`;
+
             try {
                 const response = await fetch(fileUrl);
                 if (!response.ok) throw new Error();
@@ -462,7 +474,7 @@
 
                 showToast('Pengunduhan selesai!', 'success');
             } catch (err) {
-                // Fallback direct open jika CORS
+                // Fallback direct open jika dibatasi CORS browser
                 const a = document.createElement('a');
                 a.href = fileUrl;
                 a.download = customFileName;
@@ -515,10 +527,9 @@
                     let label = item.type || `DOWNLOAD MEDIA ${index + 1}`;
 
                     const ext = item.url.includes('.png') ? 'png' : (item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.webp') ? 'jpg' : 'mp4');
-                    const fileName = `ArulXd-${data.id || Date.now()}.${ext}`;
 
                     actions.innerHTML += `
-                        <button onclick="downloadDirectFile('${item.url}', '${fileName}')" class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
+                        <button onclick="downloadDirectFile('${item.url}', '${ext}')" class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                 <polyline points="7 10 12 15 17 10"/>
@@ -531,9 +542,8 @@
             }
 
             if (data.music_info && data.music_info.url) {
-                const musicFileName = `ArulXd-${data.id || Date.now()}.mp3`;
                 actions.innerHTML += `
-                    <button onclick="downloadDirectFile('${data.music_info.url}', '${musicFileName}')" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
+                    <button onclick="downloadDirectFile('${data.music_info.url}', 'mp3')" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 18V5l12-2v13"/>
                             <circle cx="6" cy="18" r="3"/>
