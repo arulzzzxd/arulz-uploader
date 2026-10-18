@@ -48,12 +48,18 @@ async function tiktokDownloader(tiktokUrl) {
             return {
                 status: true,
                 data: {
-                    video_tanpa_watermark: videoUrl,
-                    audio_mp3: raw.music_info?.url || '',
-                    caption: raw.title || raw.caption || '',
-                    author: raw.author ? (raw.author.nickname || raw.author.fullname || raw.author) : 'TikTok User',
+                    title: raw.title || raw.caption || '',
+                    taken_at: raw.taken_at || '',
+                    region: raw.region || '',
+                    id: raw.id || '',
+                    duration: raw.duration || '',
                     cover: raw.cover || '',
-                    media: mediaList
+                    media: mediaList,
+                    music_info: raw.music_info || null,
+                    stats: raw.stats || null,
+                    author: raw.author || null,
+                    video_tanpa_watermark: videoUrl,
+                    audio_mp3: raw.music_info?.url || ''
                 }
             };
         }
@@ -79,18 +85,47 @@ async function tiktokDownloader(tiktokUrl) {
         if (resData && resData.code === 0 && resData.data) {
             const d = resData.data;
             const playUrl = d.play ? (d.play.startsWith('http') ? d.play : `https://www.tikwm.com${d.play}`) : '';
+            const hdPlayUrl = d.hdplay ? (d.hdplay.startsWith('http') ? d.hdplay : `https://www.tikwm.com${d.hdplay}`) : '';
+            const wmPlayUrl = d.wmplay ? (d.wmplay.startsWith('http') ? d.wmplay : `https://www.tikwm.com${d.wmplay}`) : '';
             const musicUrl = d.music ? (d.music.startsWith('http') ? d.music : `https://www.tikwm.com${d.music}`) : '';
             const coverUrl = d.cover ? (d.cover.startsWith('http') ? d.cover : `https://www.tikwm.com${d.cover}`) : '';
+
+            const mediaArr = [];
+            if (wmPlayUrl) mediaArr.push({ type: 'watermark', url: wmPlayUrl });
+            if (playUrl) mediaArr.push({ type: 'nowatermark', url: playUrl });
+            if (hdPlayUrl) mediaArr.push({ type: 'nowatermark_hd', url: hdPlayUrl });
 
             return {
                 status: true,
                 data: {
-                    video_tanpa_watermark: playUrl,
-                    audio_mp3: musicUrl,
-                    caption: d.title || '',
-                    author: d.author?.nickname || d.author?.unique_id || 'TikTok User',
+                    title: d.title || '',
+                    taken_at: '',
+                    region: d.region || '',
+                    id: d.id || '',
+                    duration: d.duration ? `${d.duration} Seconds` : '',
                     cover: coverUrl,
-                    media: []
+                    media: mediaArr,
+                    music_info: {
+                        id: '',
+                        title: d.music_info?.title || 'Original Sound',
+                        author: d.music_info?.author || '',
+                        url: musicUrl
+                    },
+                    stats: {
+                        views: d.play_count ? d.play_count.toLocaleString('id-ID') : '0',
+                        likes: d.digg_count ? d.digg_count.toLocaleString('id-ID') : '0',
+                        comment: d.comment_count ? d.comment_count.toLocaleString('id-ID') : '0',
+                        share: d.share_count ? d.share_count.toLocaleString('id-ID') : '0',
+                        download: d.download_count ? d.download_count.toLocaleString('id-ID') : '0'
+                    },
+                    author: {
+                        id: d.author?.id || '',
+                        fullname: d.author?.unique_id || '',
+                        nickname: d.author?.nickname || 'TikTok User',
+                        avatar: d.author?.avatar || ''
+                    },
+                    video_tanpa_watermark: hdPlayUrl || playUrl || wmPlayUrl,
+                    audio_mp3: musicUrl
                 }
             };
         }
@@ -201,8 +236,11 @@ app.get('/api/v1/download', async (req, res) => {
                 status: true,
                 platform: 'PINTEREST',
                 data: {
-                    caption: displayTitle,
-                    author: user.fullName || user.username || 'Pinterest Creator',
+                    title: displayTitle,
+                    author: {
+                        nickname: user.fullName || user.username || 'Pinterest Creator',
+                        avatar: ''
+                    },
                     cover: coverUrl,
                     media: formattedMedia
                 }
@@ -221,14 +259,7 @@ app.get('/api/v1/download', async (req, res) => {
             return res.json({
                 status: true,
                 platform: 'TIKTOK',
-                data: {
-                    video_tanpa_watermark: rawData.data.video_tanpa_watermark || '',
-                    audio_mp3: rawData.data.audio_mp3 || '',
-                    caption: rawData.data.caption || '',
-                    author: rawData.data.author || '',
-                    cover: rawData.data.cover || '',
-                    media: rawData.data.media || []
-                }
+                data: rawData.data
             });
         }
     } catch (error) {
