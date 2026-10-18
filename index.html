@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARULZXD Extractor - Pro Media Downloader</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700;800;900&display=swap" rel="stylesheet">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -139,7 +139,7 @@
     <!-- Header Navigation -->
     <header class="w-full max-w-5xl mx-auto px-4 pt-6 pb-4">
         <div class="neo-box p-4 flex flex-wrap items-center justify-between gap-4">
-            
+
             <a href="#" class="flex items-center gap-3 group">
                 <div class="w-11 h-11 bg-neoYellow border-3 border-black rounded-xl shadow-neo-sm flex items-center justify-center font-display font-black text-lg group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
                     AXD
@@ -181,7 +181,7 @@
 
     <!-- Main Section -->
     <main class="w-full max-w-4xl mx-auto px-4 mt-6 flex-grow flex flex-col gap-8">
-        
+
         <section class="text-center relative pt-4 pb-2">
             <div class="inline-flex items-center gap-2 bg-neoPink text-black border-2 border-black px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase mb-4 shadow-neo-sm">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -291,7 +291,7 @@
                 <div class="md:col-span-7 flex flex-col justify-between gap-4">
                     <div>
                         <h2 id="res-title" class="font-display font-black text-lg sm:text-xl leading-snug mb-3"></h2>
-                        <div id="res-stats" class="flex justify-between bg-slate-100 dark:bg-slate-800 border-2 border-black rounded-lg p-2.5 mb-4 text-xs font-black"></div>
+                        <div id="res-stats" class="bg-slate-100 dark:bg-slate-800 border-2 border-black rounded-lg p-3 mb-4 text-xs font-black"></div>
                     </div>
 
                     <div id="res-actions" class="flex flex-col gap-3"></div>
@@ -497,28 +497,68 @@
 
             typeTag.innerText = `${resData.platform || 'MEDIA'} DOWNLOAD`;
 
-            const authorName = typeof d.author === 'string' ? d.author : (d.author?.nickname || d.author?.fullname || 'Creator');
+            const authorName = typeof d.author === 'object' ? (d.author?.nickname || d.author?.fullname || 'TikTok User') : (d.author || 'Creator');
+            const authorSub = typeof d.author === 'object' && d.author?.fullname ? `@${d.author.fullname}` : '';
             const authorAvatar = typeof d.author === 'object' ? (d.author?.avatar || '') : '';
 
             authorContainer.innerHTML = `
                 ${authorAvatar ? `<img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${authorAvatar}" alt="Avatar">` : ''}
                 <div>
                     <div class="font-extrabold text-sm">${authorName}</div>
+                    ${authorSub ? `<div class="text-xs text-slate-500 font-bold">${authorSub}</div>` : ''}
                 </div>
             `;
 
             thumb.src = d.cover || 'https://via.placeholder.com/400x400?text=Media+Preview';
-            title.innerText = d.caption || d.title || 'Media Terpilih';
+            title.innerText = d.title || d.caption || 'Media Terpilih';
 
-            stats.innerHTML = `
-                <span>PLATFORM: ${resData.platform || 'ONLINE'}</span>
-                <span>STATUS: READY</span>
-            `;
+            if (d.stats && typeof d.stats === 'object') {
+                stats.innerHTML = `
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full text-center">
+                        <div><span class="text-slate-400 block text-[10px] font-bold">VIEWS</span> ${d.stats.views || '0'}</div>
+                        <div><span class="text-slate-400 block text-[10px] font-bold">LIKES</span> ${d.stats.likes || '0'}</div>
+                        <div><span class="text-slate-400 block text-[10px] font-bold">COMMENTS</span> ${d.stats.comment || '0'}</div>
+                        <div><span class="text-slate-400 block text-[10px] font-bold">SHARES</span> ${d.stats.share || '0'}</div>
+                    </div>
+                `;
+            } else {
+                stats.innerHTML = `
+                    <div class="flex justify-between">
+                        <span>PLATFORM: ${resData.platform || 'ONLINE'}</span>
+                        <span>STATUS: READY</span>
+                    </div>
+                `;
+            }
 
             actions.innerHTML = '';
 
-            // Tombol Video Tanpa Watermark (TikTok)
-            if (d.video_tanpa_watermark) {
+            // Tombol Media Array (Watermark, No Watermark, No Watermark HD)
+            if (Array.isArray(d.media) && d.media.length > 0) {
+                const labelMap = {
+                    'nowatermark_hd': { label: 'DOWNLOAD NO WATERMARK (HD)', bg: 'bg-neoGreen' },
+                    'nowatermark': { label: 'DOWNLOAD NO WATERMARK (MP4)', bg: 'bg-neoYellow' },
+                    'watermark': { label: 'DOWNLOAD WITH WATERMARK (MP4)', bg: 'bg-neoCyan' }
+                };
+
+                d.media.forEach((item, index) => {
+                    const conf = labelMap[item.type] || { 
+                        label: item.type ? `DOWNLOAD ${item.type.toUpperCase()}` : `DOWNLOAD MEDIA ${index + 1}`,
+                        bg: 'bg-neoYellow'
+                    };
+                    const ext = item.url.includes('.png') ? 'png' : (item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.webp') ? 'jpg' : 'mp4');
+
+                    actions.innerHTML += `
+                        <button onclick="downloadDirectFile('${item.url}', '${ext}')" class="neo-btn p-3.5 ${conf.bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            <span>${conf.label}</span>
+                        </button>
+                    `;
+                });
+            } else if (d.video_tanpa_watermark) {
                 actions.innerHTML += `
                     <button onclick="downloadDirectFile('${d.video_tanpa_watermark}', 'mp4')" class="neo-btn p-3.5 bg-neoYellow text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -531,30 +571,9 @@
                 `;
             }
 
-            // Tombol Media Array (Pinterest)
-            if (Array.isArray(d.media) && d.media.length > 0) {
-                const colors = ['bg-neoYellow', 'bg-neoCyan', 'bg-neoGreen', 'bg-neoPink'];
-
-                d.media.forEach((item, index) => {
-                    const bg = colors[index % colors.length];
-                    let label = item.type || `DOWNLOAD MEDIA ${index + 1}`;
-                    const ext = item.url.includes('.png') ? 'png' : (item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.webp') ? 'jpg' : 'mp4');
-
-                    actions.innerHTML += `
-                        <button onclick="downloadDirectFile('${item.url}', '${ext}')" class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            <span>${label}</span>
-                        </button>
-                    `;
-                });
-            }
-
             // Tombol Audio MP3
-            const audioUrl = d.audio_mp3 || d.music_info?.url;
+            const audioUrl = d.music_info?.url || d.audio_mp3;
+            const musicLabel = d.music_info?.title ? ` (${d.music_info.title})` : '';
             if (audioUrl) {
                 actions.innerHTML += `
                     <button onclick="downloadDirectFile('${audioUrl}', 'mp3')" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
@@ -563,7 +582,7 @@
                             <circle cx="6" cy="18" r="3"/>
                             <circle cx="18" cy="16" r="3"/>
                         </svg>
-                        <span>DOWNLOAD AUDIO MP3</span>
+                        <span>DOWNLOAD AUDIO MP3${musicLabel}</span>
                     </button>
                 `;
             }
@@ -594,13 +613,13 @@
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
+
             let bg = 'bg-neoYellow';
             if (type === 'error') bg = 'bg-neoPink text-white';
             if (type === 'success') bg = 'bg-neoGreen text-black';
 
             toast.className = `neo-box ${bg} p-3 text-xs font-black flex items-center justify-between gap-3 shadow-neo-sm pointer-events-auto transform transition-all duration-200 translate-y-2 opacity-0`;
-            
+
             toast.innerHTML = `
                 <span>${msg}</span>
                 <button onclick="this.parentElement.remove()" class="font-extrabold text-sm">✕</button>
