@@ -187,7 +187,7 @@
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
-                <span>FASTER & CLEANER EXTRACTOR</span>
+                <span>ALL-IN-ONE MEDIA EXTRACTOR</span>
             </div>
 
             <h1 class="font-display text-3xl sm:text-5xl font-black uppercase tracking-tight leading-tight mb-4">
@@ -196,16 +196,16 @@
             </h1>
 
             <p class="text-sm sm:text-base font-semibold text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
-                Tempel link media sosial di bawah. Sistem otomatis mendeteksi platform dan menyediakan unduhan video HD tanpa watermark serta audio MP3 secara instan.
+                Tempel link media sosial (TikTok, Facebook, Instagram, YouTube, Pinterest, dll). Sistem otomatis mengekstraksi media secara instan.
             </p>
         </section>
 
         <!-- Input Box -->
         <section class="neo-box p-6 sm:p-8 bg-neoCard relative">
             <div id="detector-badge" class="hidden items-center gap-2 mb-4">
-                <span class="text-xs font-black uppercase tracking-wider text-slate-500">Platform Terdeteksi:</span>
+                <span class="text-xs font-black uppercase tracking-wider text-slate-500">Status Tautan:</span>
                 <div id="detector-pill" class="flex items-center gap-1.5 px-3 py-1 bg-neoYellow border-2 border-black rounded-md text-xs font-black shadow-neo-sm">
-                    <span id="detector-name">TIKTOK</span>
+                    <span id="detector-name">READY</span>
                 </div>
             </div>
 
@@ -222,7 +222,7 @@
                         type="url" 
                         id="media-url" 
                         class="neo-input w-full pl-12 pr-20 py-4 font-bold text-sm sm:text-base placeholder:text-slate-400" 
-                        placeholder="Tempel tautan TikTok atau Pinterest..."
+                        placeholder="Tempel tautan media di sini..."
                         autocomplete="off"
                         oninput="handleInput(this.value)"
                     />
@@ -284,7 +284,6 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-5 relative">
                     <div class="neo-box overflow-hidden bg-black aspect-video md:aspect-square flex items-center justify-center relative">
-                        <!-- referrerpolicy="no-referrer" menembus CORS Hotlink TikTok/TikWM -->
                         <img id="res-thumb" src="" alt="Media Thumbnail" referrerpolicy="no-referrer" class="w-full h-full object-cover"/>
                     </div>
                 </div>
@@ -292,49 +291,15 @@
                 <div class="md:col-span-7 flex flex-col justify-between gap-4">
                     <div>
                         <h2 id="res-title" class="font-display font-black text-lg sm:text-xl leading-snug mb-3"></h2>
-                        <div id="res-stats" class="bg-slate-100 dark:bg-slate-800 border-2 border-black rounded-lg p-3 mb-4 text-xs font-black"></div>
+                        <div id="res-stats" class="bg-slate-100 dark:bg-slate-800 border-2 border-black rounded-lg p-3 mb-4 text-xs font-black">
+                            <div class="flex justify-between">
+                                <span>STATUS: READY</span>
+                                <span>ALL-IN-ONE EXTRACTOR</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="res-actions" class="flex flex-col gap-3"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section Platform Didukung -->
-        <section class="mt-2">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 bg-neoYellow border-2 border-black rounded-sm"></div>
-                    <h2 class="font-display font-black text-xl uppercase">PLATFORM DIDUKUNG</h2>
-                </div>
-                <span class="text-xs font-extrabold bg-neoCyan border-2 border-black px-2.5 py-1 rounded-md">6 OTOMATIS</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="w-10 h-10 bg-black text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
-                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.525.001c1.31 0 2.61.115 3.841.348V5.01a8.03 8.03 0 01-2.221-.302c-1.127-.302-1.93-.972-1.93-2.203V0h.31zm3.84 5.358c1.378 1.042 2.923 1.706 4.635 1.832v4.205a11.96 11.96 0 01-4.635-1.042v6.62c0 4.135-3.353 7.488-7.488 7.488S1.389 21.147 1.389 17.012c0-4.135 3.354-7.488 7.489-7.488.463 0 .915.042 1.354.125V14.1a3.292 3.292 0 00-1.354-.286c-1.815 0-3.287 1.472-3.287 3.287 0 1.815 1.472 3.287 3.287 3.287 1.815 0 3.287-1.472 3.287-3.287V.001h4.202v5.358z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-black bg-neoYellow border-2 border-black px-2 py-0.5 rounded uppercase">POPULER</span>
-                        </div>
-                        <h3 class="font-display font-black text-base mb-1">TIKTOK</h3>
-                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Download video tanpa watermark, kualitas HD 1080p, dan ekstraksi audio MP3.</p>
-                    </div>
-                </div>
-
-                <div class="neo-box p-5 bg-neoCard flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="w-10 h-10 bg-red-700 text-white border-2 border-black rounded-xl shadow-neo-sm flex items-center justify-center">
-                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-black bg-neoYellow border-2 border-black px-2 py-0.5 rounded uppercase">PINS</span>
-                        </div>
-                        <h3 class="font-display font-black text-base mb-1">PINTEREST</h3>
-                        <p class="text-xs text-slate-500 font-semibold leading-relaxed mb-3">Unduh video Pin inspiratif dan gambar resolusi penuh.</p>
-                    </div>
                 </div>
             </div>
         </section>
@@ -362,7 +327,6 @@
             }
         }
 
-        // Generator 20 Karakter Acak
         function generate20RandomChars() {
             let result = '';
             const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -375,23 +339,12 @@
         function handleInput(url) {
             const clearBtn = document.getElementById('clear-btn');
             const badge = document.getElementById('detector-badge');
-            const nameEl = document.getElementById('detector-name');
 
             if (url.trim() !== '') {
                 clearBtn.classList.remove('hidden');
                 clearBtn.classList.add('flex');
-
-                if (/tiktok\.com/i.test(url)) {
-                    badge.classList.remove('hidden');
-                    badge.classList.add('flex');
-                    nameEl.innerText = 'TIKTOK';
-                } else if (/pinterest\.com|pin\.it/i.test(url)) {
-                    badge.classList.remove('hidden');
-                    badge.classList.add('flex');
-                    nameEl.innerText = 'PINTEREST';
-                } else {
-                    badge.classList.add('hidden');
-                }
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
             } else {
                 clearBtn.classList.add('hidden');
                 badge.classList.add('hidden');
@@ -453,7 +406,6 @@
             }
         }
 
-        // Pengunduh Langsung dengan Format Nama: arulzxd[20_random_karakter].[ext]
         async function downloadDirectFile(fileUrl, ext) {
             showToast('Memulai pengunduhan berkas...', 'info');
             const customFileName = `arulzxd${generate20RandomChars()}.${ext}`;
@@ -490,7 +442,6 @@
             const authorContainer = document.getElementById('author-container');
             const thumb = document.getElementById('res-thumb');
             const title = document.getElementById('res-title');
-            const stats = document.getElementById('res-stats');
             const actions = document.getElementById('res-actions');
             const typeTag = document.getElementById('result-type-tag');
 
@@ -498,95 +449,47 @@
 
             typeTag.innerText = `${resData.platform || 'MEDIA'} DOWNLOAD`;
 
-            const authorName = typeof d.author === 'object' ? (d.author?.nickname || d.author?.fullname || 'TikTok User') : (d.author || 'Creator');
-            const authorSub = typeof d.author === 'object' && d.author?.fullname ? `@${d.author.fullname}` : '';
+            const authorName = typeof d.author === 'object' ? (d.author?.nickname || d.author?.fullname || 'Creator') : (d.author || 'Creator');
             const authorAvatar = typeof d.author === 'object' ? (d.author?.avatar || '') : '';
 
-            // Menambahkan referrerpolicy="no-referrer" agar avatar muncul di Vercel
             authorContainer.innerHTML = `
                 ${authorAvatar ? `<img referrerpolicy="no-referrer" class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${authorAvatar}" alt="Avatar">` : ''}
                 <div>
                     <div class="font-extrabold text-sm">${authorName}</div>
-                    ${authorSub ? `<div class="text-xs text-slate-500 font-bold">${authorSub}</div>` : ''}
                 </div>
             `;
 
             thumb.src = d.cover || 'https://via.placeholder.com/400x400?text=Media+Preview';
             title.innerText = d.title || d.caption || 'Media Terpilih';
 
-            if (d.stats && typeof d.stats === 'object') {
-                stats.innerHTML = `
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full text-center">
-                        <div><span class="text-slate-400 block text-[10px] font-bold">VIEWS</span> ${d.stats.views || '0'}</div>
-                        <div><span class="text-slate-400 block text-[10px] font-bold">LIKES</span> ${d.stats.likes || '0'}</div>
-                        <div><span class="text-slate-400 block text-[10px] font-bold">COMMENTS</span> ${d.stats.comment || '0'}</div>
-                        <div><span class="text-slate-400 block text-[10px] font-bold">SHARES</span> ${d.stats.share || '0'}</div>
-                    </div>
-                `;
-            } else {
-                stats.innerHTML = `
-                    <div class="flex justify-between">
-                        <span>PLATFORM: ${resData.platform || 'ONLINE'}</span>
-                        <span>STATUS: READY</span>
-                    </div>
-                `;
-            }
-
             actions.innerHTML = '';
 
-            // Tombol Media Array (Watermark, No Watermark, No Watermark HD)
+            // Render Otomatis Setiap Tombol Unduhan dari SaveFBS
             if (Array.isArray(d.media) && d.media.length > 0) {
-                const labelMap = {
-                    'nowatermark_hd': { label: 'DOWNLOAD NO WATERMARK (HD)', bg: 'bg-neoGreen' },
-                    'nowatermark': { label: 'DOWNLOAD NO WATERMARK (MP4)', bg: 'bg-neoYellow' },
-                    'watermark': { label: 'DOWNLOAD WITH WATERMARK (MP4)', bg: 'bg-neoCyan' }
-                };
+                const colors = ['bg-neoYellow', 'bg-neoCyan', 'bg-neoGreen', 'bg-neoPink'];
 
                 d.media.forEach((item, index) => {
-                    const conf = labelMap[item.type] || { 
-                        label: item.type ? `DOWNLOAD ${item.type.toUpperCase()}` : `DOWNLOAD MEDIA ${index + 1}`,
-                        bg: 'bg-neoYellow'
-                    };
-                    const ext = item.url.includes('.png') ? 'png' : (item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.webp') ? 'jpg' : 'mp4');
+                    const bg = colors[index % colors.length];
+                    const label = item.type || `DOWNLOAD MEDIA ${index + 1}`;
+                    
+                    let ext = 'mp4';
+                    if (item.url.includes('.mp3') || label.toLowerCase().includes('audio') || label.toLowerCase().includes('mp3')) {
+                        ext = 'mp3';
+                    } else if (item.url.includes('.png') || item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.webp')) {
+                        ext = 'jpg';
+                    }
 
                     actions.innerHTML += `
-                        <button onclick="downloadDirectFile('${item.url}', '${ext}')" class="neo-btn p-3.5 ${conf.bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
+                        <button onclick="downloadDirectFile('${item.url}', '${ext}')" class="neo-btn p-3.5 ${bg} text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                 <polyline points="7 10 12 15 17 10"/>
                                 <line x1="12" y1="15" x2="12" y2="3"/>
                             </svg>
-                            <span>${conf.label}</span>
+                            <span>${label}</span>
                         </button>
                     `;
                 });
-            } else if (d.video_tanpa_watermark) {
-                actions.innerHTML += `
-                    <button onclick="downloadDirectFile('${d.video_tanpa_watermark}', 'mp4')" class="neo-btn p-3.5 bg-neoYellow text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        <span>DOWNLOAD NO WATERMARK MP4</span>
-                    </button>
-                `;
-            }
-
-            // Tombol Audio MP3
-            const audioUrl = d.music_info?.url || d.audio_mp3;
-            const musicLabel = d.music_info?.title ? ` (${d.music_info.title})` : '';
-            if (audioUrl) {
-                actions.innerHTML += `
-                    <button onclick="downloadDirectFile('${audioUrl}', 'mp3')" class="neo-btn p-3.5 bg-neoPink text-black flex items-center justify-center gap-2 text-xs uppercase font-extrabold w-full cursor-pointer">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 18V5l12-2v13"/>
-                            <circle cx="6" cy="18" r="3"/>
-                            <circle cx="18" cy="16" r="3"/>
-                        </svg>
-                        <span>DOWNLOAD AUDIO MP3${musicLabel}</span>
-                    </button>
-                `;
             }
 
             card.classList.remove('hidden');
