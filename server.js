@@ -10,48 +10,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Helper Proxy URL agar gambar tidak diblokir CORS/Referer TikWM
-function getProxyUrl(req, originalUrl) {
-    if (!originalUrl) return '';
-    const protocol = req.protocol || 'http';
-    const host = req.get('host') || `localhost:${PORT}`;
-    return `${protocol}://${host}/api/v1/proxy?url=${encodeURIComponent(originalUrl)}`;
+function generate20Digits() {
+    let result = '';
+    for (let i = 0; i < 20; i++) {
+        result += Math.floor(Math.random() * 10);
+    }
+    return result;
 }
 
-// Route Proxy Media / Gambar dengan Auto Content-Type
-app.get('/api/v1/proxy', async (req, res) => {
-    const { url } = req.query;
-    if (!url) return res.status(400).send('URL media wajib diisi');
-
-    try {
-        const response = await axios({
-            method: 'get',
-            url: url,
-            responseType: 'stream',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Referer': 'https://www.tikwm.com/'
-            },
-            timeout: 10000
-        });
-
-        if (response.headers['content-type']) {
-            res.setHeader('Content-Type', response.headers['content-type']);
-        }
-        if (response.headers['content-length']) {
-            res.setHeader('Content-Length', response.headers['content-length']);
-        }
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-
-        response.data.pipe(res);
-    } catch (error) {
-        console.error('Proxy Stream Error:', error.message);
-        res.status(500).send('Gagal memuat berkas media.');
-    }
-});
-
 // Scraper TikTok API v2 (ttdlv2) dengan Fallback Otomatis
-async function tiktokDownloader(tiktokUrl, req) {
+async function tiktokDownloader(tiktokUrl) {
     const primaryUrl = 'https://api.arulzzxd.my.id/api/download/ttdlv2';
     
     // 1. Coba API Utama (ttdlv2)
@@ -77,9 +45,6 @@ async function tiktokDownloader(tiktokUrl, req) {
 
             const videoUrl = noWmHd?.url || noWm?.url || wm?.url || '';
 
-            const rawCover = raw.cover || '';
-            const rawAvatar = raw.author?.avatar || '';
-
             return {
                 status: true,
                 data: {
@@ -88,7 +53,7 @@ async function tiktokDownloader(tiktokUrl, req) {
                     region: raw.region || '',
                     id: raw.id || '',
                     duration: raw.duration || '',
-                    cover: getProxyUrl(req, rawCover),
+                    cover: raw.cover || '',
                     media: mediaList,
                     music_info: raw.music_info || null,
                     stats: raw.stats || null,
@@ -96,7 +61,7 @@ async function tiktokDownloader(tiktokUrl, req) {
                         id: raw.author?.id || '',
                         fullname: raw.author?.fullname || '',
                         nickname: raw.author?.nickname || 'TikTok User',
-                        avatar: getProxyUrl(req, rawAvatar)
+                        avatar: raw.author?.avatar || ''
                     },
                     video_tanpa_watermark: videoUrl,
                     audio_mp3: raw.music_info?.url || ''
@@ -128,9 +93,8 @@ async function tiktokDownloader(tiktokUrl, req) {
             const hdPlayUrl = d.hdplay ? (d.hdplay.startsWith('http') ? d.hdplay : `https://www.tikwm.com${d.hdplay}`) : '';
             const wmPlayUrl = d.wmplay ? (d.wmplay.startsWith('http') ? d.wmplay : `https://www.tikwm.com${d.wmplay}`) : '';
             const musicUrl = d.music ? (d.music.startsWith('http') ? d.music : `https://www.tikwm.com${d.music}`) : '';
-            
-            const rawCoverUrl = d.cover ? (d.cover.startsWith('http') ? d.cover : `https://www.tikwm.com${d.cover}`) : '';
-            const rawAvatarUrl = d.author?.avatar ? (d.author.avatar.startsWith('http') ? d.author.avatar : `https://www.tikwm.com${d.author.avatar}`) : '';
+            const rawCover = d.cover ? (d.cover.startsWith('http') ? d.cover : `https://www.tikwm.com${d.cover}`) : '';
+            const rawAvatar = d.author?.avatar ? (d.author.avatar.startsWith('http') ? d.author.avatar : `https://www.tikwm.com${d.author.avatar}`) : '';
 
             const mediaArr = [];
             if (wmPlayUrl) mediaArr.push({ type: 'watermark', url: wmPlayUrl });
@@ -145,7 +109,7 @@ async function tiktokDownloader(tiktokUrl, req) {
                     region: d.region || '',
                     id: d.id || '',
                     duration: d.duration ? `${d.duration} Seconds` : '',
-                    cover: getProxyUrl(req, rawCoverUrl),
+                    cover: rawCover,
                     media: mediaArr,
                     music_info: {
                         id: '',
@@ -164,7 +128,7 @@ async function tiktokDownloader(tiktokUrl, req) {
                         id: d.author?.id || '',
                         fullname: d.author?.unique_id || '',
                         nickname: d.author?.nickname || 'TikTok User',
-                        avatar: getProxyUrl(req, rawAvatarUrl)
+                        avatar: rawAvatar
                     },
                     video_tanpa_watermark: hdPlayUrl || playUrl || wmPlayUrl,
                     audio_mp3: musicUrl
@@ -179,7 +143,7 @@ async function tiktokDownloader(tiktokUrl, req) {
 }
 
 // Scraper Pinterest API (pinterestdl)
-async function pinterestDownloader(pinterestUrl, req) {
+async function pinterestDownloader(pinterestUrl) {
     const apiUrl = 'https://api.arulzzxd.my.id/api/download/pinterestdl';
     try {
         const response = await axios.get(apiUrl, {
@@ -213,7 +177,7 @@ app.get('/api/v1/download', async (req, res) => {
         const isPinterest = /pinterest\.com|pin\.it/i.test(url);
 
         if (isPinterest) {
-            const rawData = await pinterestDownloader(url, req);
+            const rawData = await pinterestDownloader(url);
             const resObj = rawData.result || rawData.data || rawData;
 
             if (!resObj) {
@@ -283,13 +247,13 @@ app.get('/api/v1/download', async (req, res) => {
                         nickname: user.fullName || user.username || 'Pinterest Creator',
                         avatar: ''
                     },
-                    cover: getProxyUrl(req, coverUrl),
+                    cover: coverUrl,
                     media: formattedMedia
                 }
             });
         } else {
             // Handler TikTok
-            const rawData = await tiktokDownloader(url, req);
+            const rawData = await tiktokDownloader(url);
 
             if (!rawData || !rawData.status || !rawData.data) {
                 return res.status(400).json({
