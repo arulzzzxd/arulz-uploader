@@ -18,11 +18,13 @@ function generate20Digits() {
     return result;
 }
 
-// Scraper TikTok API (ttdl)
+// Scraper TikTok API (dengan Fallback Otomatis)
 async function tiktokDownloader(tiktokUrl) {
-    const apiUrl = 'https://api.arulzzxd.my.id/api/download/ttdl';
+    const primaryUrl = 'https://api.arulzzxd.my.id/api/download/ttdl';
+    
+    // 1. Coba API Utama
     try {
-        const response = await axios.get(apiUrl, {
+        const response = await axios.get(primaryUrl, {
             params: {
                 url: tiktokUrl,
                 apikey: 'haqqiarulz'
@@ -30,13 +32,53 @@ async function tiktokDownloader(tiktokUrl) {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             },
-            timeout: 15000
+            timeout: 10000
         });
-        return response.data;
+
+        if (response.data && response.data.status && response.data.data) {
+            return response.data;
+        }
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Gagal terhubung ke API TikTok.');
+        console.warn('API Utama TikTok bermasalah, mengalihkan ke API cadangan (TikWM)...');
     }
+
+    // 2. Fallback ke TikWM API jika API Utama gagal
+    try {
+        const tikwmRes = await axios.post(
+            'https://www.tikwm.com/api/',
+            new URLSearchParams({ url: tiktokUrl, hd: '1' }),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                },
+                timeout: 12000
+            }
+        );
+
+        const resData = tikwmRes.data;
+        if (resData && resData.code === 0 && resData.data) {
+            const d = resData.data;
+            const playUrl = d.play ? (d.play.startsWith('http') ? d.play : `https://www.tikwm.com${d.play}`) : '';
+            const musicUrl = d.music ? (d.music.startsWith('http') ? d.music : `https://www.tikwm.com${d.music}`) : '';
+
+            return {
+                status: true,
+                data: {
+                    video_tanpa_watermark: playUrl,
+                    audio_mp3: musicUrl,
+                    caption: d.title || '',
+                    author: d.author?.nickname || d.author?.unique_id || 'TikTok User'
+                }
+            };
+        }
+    } catch (fallbackError) {
+        console.error('API Cadangan TikWM juga gagal:', fallbackError.message);
+    }
+
+    throw new Error('Gagal terhubung ke semua API TikTok. Silakan pastikan tautan valid atau coba lagi nanti.');
 }
+
 
 // Scraper Pinterest API (pinterestdl)
 async function pinterestDownloader(pinterestUrl) {
