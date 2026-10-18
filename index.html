@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Mencegah pemblokiran hotlink gambar dari TikWM -->
+    <meta name="referrer" content="no-referrer">
     <title>ARULZXD Extractor - Pro Media Downloader</title>
 
     <!-- Google Fonts -->
@@ -284,7 +286,8 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-5 relative">
                     <div class="neo-box overflow-hidden bg-black aspect-video md:aspect-square flex items-center justify-center relative">
-                        <img id="res-thumb" src="" alt="Media Thumbnail" class="w-full h-full object-cover"/>
+                        <!-- Menambahkan referrerpolicy="no-referrer" agar cover TikWM tidak diblokir -->
+                        <img id="res-thumb" referrerpolicy="no-referrer" src="" alt="Media Thumbnail" class="w-full h-full object-cover"/>
                     </div>
                 </div>
 
@@ -501,8 +504,9 @@
             const authorSub = typeof d.author === 'object' && d.author?.fullname ? `@${d.author.fullname}` : '';
             const authorAvatar = typeof d.author === 'object' ? (d.author?.avatar || '') : '';
 
+            // Menambahkan referrerpolicy="no-referrer" agar avatar TikWM tidak diblokir
             authorContainer.innerHTML = `
-                ${authorAvatar ? `<img class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${authorAvatar}" alt="Avatar">` : ''}
+                ${authorAvatar ? `<img referrerpolicy="no-referrer" class="w-10 h-10 rounded-full border-2 border-black object-cover" src="${authorAvatar}" alt="Avatar">` : ''}
                 <div>
                     <div class="font-extrabold text-sm">${authorName}</div>
                     ${authorSub ? `<div class="text-xs text-slate-500 font-bold">${authorSub}</div>` : ''}
